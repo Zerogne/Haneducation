@@ -1,17 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useLanguage } from "@/contexts/language-context"
 import { Button } from "@/components/ui/button"
-import { Moon, Sun, Globe } from "lucide-react"
+import { Moon, Sun, Globe, ChevronDown } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { Logo } from "@/components/ui/logo"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Header() {
-  const { language, setLanguage } = useLanguage()
-  const { theme, setTheme } = useTheme()
+  const { language, setLanguage, isHydrated } = useLanguage()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const translations = {
     mn: {
@@ -20,7 +31,6 @@ export default function Header() {
       services: "Үйлчилгээ",
       team: "Багийн гишүүд",
       contact: "Холбоо барих",
-      register: "Бүртгүүлэх",
     },
     en: {
       home: "Home",
@@ -28,7 +38,13 @@ export default function Header() {
       services: "Services",
       team: "Team",
       contact: "Contact",
-      register: "Register",
+    },
+    zh: {
+      home: "主页",
+      about: "关于我们",
+      services: "服务",
+      team: "团队",
+      contact: "联系",
     },
   }
 
@@ -65,30 +81,46 @@ export default function Header() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Language Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLanguage(language === "mn" ? "en" : "mn")}
-              className="flex items-center space-x-2"
-            >
-              <Globe className="h-4 w-4" />
-              <span>{language === "mn" ? "EN" : "MN"}</span>
-            </Button>
+            {/* Language Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <Globe className="h-4 w-4" />
+                  <span>
+                    {!isHydrated ? "🇲🇳" : language === "mn" ? "🇲🇳" : language === "en" ? "🇺🇸" : "🇨🇳"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setLanguage("mn")}>
+                  🇲🇳 Монгол
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("en")}>
+                  🇺🇸 English
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("zh")}>
+                  🇨🇳 中文
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Theme Toggle */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
+              disabled={!mounted}
             >
-              {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              {!mounted ? (
+                <div className="h-4 w-4" />
+              ) : resolvedTheme === "light" ? (
+                <Moon className="h-4 w-4" />
+              ) : (
+                <Sun className="h-4 w-4" />
+              )}
             </Button>
 
-            {/* Register Button */}
-            <Button asChild>
-              <Link href="/registration">{t.register}</Link>
-            </Button>
+
           </div>
 
           {/* Mobile Menu Button */}
@@ -115,8 +147,10 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t">
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}>
+          <div className="py-4 border-t">
             <nav className="flex flex-col space-y-4">
               <Link
                 href="/"
@@ -154,29 +188,46 @@ export default function Header() {
                 {t.contact}
               </Link>
               <div className="flex items-center space-x-4 pt-4">
+                {/* Mobile Language Selector */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                      <Globe className="h-4 w-4" />
+                      <span>
+                        {!isHydrated ? "🇲🇳" : language === "mn" ? "🇲🇳" : language === "en" ? "🇺🇸" : "🇨🇳"}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setLanguage("mn")}>
+                      🇲🇳 Монгол
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLanguage("en")}>
+                      🇺🇸 English
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLanguage("zh")}>
+                      🇨🇳 中文
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setLanguage(language === "mn" ? "en" : "mn")}
-                  className="flex items-center space-x-2"
+                  onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
+                  disabled={!mounted}
                 >
-                  <Globe className="h-4 w-4" />
-                  <span>{language === "mn" ? "EN" : "MN"}</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                >
-                  {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                </Button>
-                <Button asChild>
-                  <Link href="/registration">{t.register}</Link>
+                  {!mounted ? (
+                    <div className="h-4 w-4" />
+                  ) : resolvedTheme === "light" ? (
+                    <Moon className="h-4 w-4" />
+                  ) : (
+                    <Sun className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </nav>
           </div>
-        )}
+        </div>
       </div>
     </header>
   )

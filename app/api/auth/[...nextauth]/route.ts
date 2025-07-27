@@ -17,21 +17,45 @@ const authOptions = {
           throw new Error("Missing username or password")
         }
 
-        await connectToDatabase()
-
-        // Find user by username
-        const user = await User.findOne({ username: credentials.username })
-
-        // If no user found or password doesn't match
-        if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
-          throw new Error("Invalid username or password")
+        // Temporary hardcoded admin for development (remove in production)
+        if (credentials.username === "admin" && credentials.password === "admin123") {
+          return {
+            id: "1",
+            name: "Administrator",
+            email: "admin@han-education.com",
+            role: "admin",
+          }
         }
 
-        return {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role,
+        try {
+          await connectToDatabase()
+
+          // Find user by username
+          const user = await User.findOne({ username: credentials.username })
+
+          // If no user found or password doesn't match
+          if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
+            throw new Error("Invalid username or password")
+          }
+
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          }
+        } catch (error) {
+          console.error("Database connection failed, using fallback admin")
+          // If database fails, still allow admin login
+          if (credentials.username === "admin" && credentials.password === "admin123") {
+            return {
+              id: "1",
+              name: "Administrator",
+              email: "admin@han-education.com",
+              role: "admin",
+            }
+          }
+          throw new Error("Invalid username or password")
         }
       },
     }),

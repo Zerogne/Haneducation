@@ -17,6 +17,7 @@ type LanguageContextType = {
   languages: Language[]
   translations: Record<string, Record<string, string>>
   t: (key: string) => string
+  isHydrated: boolean
 }
 
 const defaultLanguages: Language[] = [
@@ -754,6 +755,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<string>("mn")
   const [languages, setLanguages] = useState<Language[]>(defaultLanguages)
+  const [isHydrated, setIsHydrated] = useState(false)
   // Use in-code translations
   const translations = inCodeTranslations;
   const router = useRouter()
@@ -765,7 +767,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (storedLanguage) {
       setLanguageState(storedLanguage)
     }
-
+    setIsHydrated(true)
   }, [])
 
   const setLanguage = (lang: string) => {
@@ -779,7 +781,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, languages, translations, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, languages, translations, t, isHydrated }}>
       {children}
     </LanguageContext.Provider>
   )

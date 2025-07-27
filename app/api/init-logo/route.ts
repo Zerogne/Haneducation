@@ -20,18 +20,16 @@ export async function POST() {
 
     // Create logo entry
     const logoImage = new Image({
-      url: "https://res.cloudinary.com/dewhswho9/image/upload/v1753428499/8f4d5273d40a38622a96290a75f72c02_480_nflduc.jpg",
       publicId: "8f4d5273d40a38622a96290a75f72c02",
-      section: "logo",
+      url: "https://res.cloudinary.com/dewhswho9/image/upload/v1753428499/8f4d5273d40a38622a96290a75f72c02_480_nflduc.jpg",
+      secureUrl: "https://res.cloudinary.com/dewhswho9/image/upload/v1753428499/8f4d5273d40a38622a96290a75f72c02_480_nflduc.jpg",
+      width: 480,
+      height: 480,
+      format: "jpg",
+      resourceType: "image",
       alt: "HAN Education Logo",
-      type: "image",
-      metadata: {
-        width: 480,
-        height: 480,
-        format: "jpg",
-        size: "cloudinary",
-        cloudinaryUrl: "https://res.cloudinary.com/dewhswho9/image/upload/v1753428499/8f4d5273d40a38622a96290a75f72c02_480_nflduc.jpg"
-      }
+      caption: "HAN Education Logo",
+      section: "logo"
     })
 
     await logoImage.save()

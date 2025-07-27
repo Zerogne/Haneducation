@@ -11,7 +11,7 @@ interface DashboardStats {
   }
 }
 
-export default function AdminDashboard() {
+export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
     students: 0,
     images: 0,
@@ -20,16 +20,42 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate loading stats
-    setTimeout(() => {
-      setStats({
-        students: 25,
-        images: 12,
-        storage: { used: "45 MB", total: "1 GB" }
-      })
-      setLoading(false)
-    }, 1000)
+    fetchDashboardStats()
   }, [])
+
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch students count
+      const studentsResponse = await fetch('/api/students')
+      const studentsData = studentsResponse.ok ? await studentsResponse.json() : { students: [] }
+      
+      // Fetch images count
+      const imagesResponse = await fetch('/api/images')
+      const imagesData = imagesResponse.ok ? await imagesResponse.json() : { images: [] }
+      
+      // Fetch storage info
+      const storageResponse = await fetch('/api/storage')
+      const storageData = storageResponse.ok ? await storageResponse.json() : { storage: { used: "0 MB", total: "1 GB" } }
+      
+      setStats({
+        students: studentsData.students?.length || 0,
+        images: imagesData.images?.length || 0,
+        storage: storageData.storage || { used: "0 MB", total: "1 GB" }
+      })
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error)
+      // Use fallback data if API fails
+      setStats({
+        students: 0,
+        images: 0,
+        storage: { used: "0 MB", total: "1 GB" }
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (loading) {
     return (

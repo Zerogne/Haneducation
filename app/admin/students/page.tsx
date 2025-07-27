@@ -1,32 +1,29 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
 
 interface Student {
   _id: string
   firstName: string
   lastName: string
-  age: number
-  currentSchool: string
-  currentGrade: string
-  highSchoolGPA: number
-  languageLevel: string
-  studyPlan: string
+  email: string
   phone: string
-  status: string
+  dateOfBirth: string
+  nationality: string
+  currentSchool: string
+  grade: string
+  intendedMajor: string
+  targetCountry: string
+  targetUniversity: string
+  budget: string
+  timeline: string
   createdAt: string
 }
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     fetchStudents()
@@ -35,182 +32,137 @@ export default function StudentsPage() {
   const fetchStudents = async () => {
     try {
       setLoading(true)
-      setError(null)
-      
-      const response = await fetch("/api/students", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      const response = await fetch('/api/students')
+      if (response.ok) {
+        const data = await response.json()
+        setStudents(data.students || [])
+      } else {
+        setError("Failed to fetch students")
       }
-
-      const data = await response.json()
-      setStudents(data.students || [])
     } catch (error) {
-      console.error("Error fetching students:", error)
-      setError("Failed to load students. Please try again.")
+      setError("Error connecting to database")
     } finally {
       setLoading(false)
     }
   }
 
-  const updateStudentStatus = async (studentId: string, newStatus: string) => {
+  const deleteStudent = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this student?")) return
+
     try {
-      const response = await fetch(`/api/students/${studentId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
+      const response = await fetch(`/api/students/${id}`, {
+        method: 'DELETE'
       })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      if (response.ok) {
+        setStudents(students.filter(student => student._id !== id))
+      } else {
+        setError("Failed to delete student")
       }
-
-      setStudents(prev =>
-        prev.map(student =>
-          student._id === studentId ? { ...student, status: newStatus } : student
-        )
-      )
     } catch (error) {
-      console.error("Error updating student status:", error)
-      alert("Failed to update student status. Please try again.")
+      setError("Error deleting student")
     }
-  }
-
-  const getStatusBadge = (status: string) => {
-    const statusColors = {
-      pending: "bg-yellow-100 text-yellow-800",
-      contacted: "bg-blue-100 text-blue-800",
-      enrolled: "bg-green-100 text-green-800",
-      rejected: "bg-red-100 text-red-800",
-    }
-
-    return (
-      <Badge className={statusColors[status as keyof typeof statusColors] || "bg-gray-100 text-gray-800"}>
-        {status}
-      </Badge>
-    )
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString()
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span>Loading students...</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-7xl mx-auto">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-red-600 mb-4">{error}</p>
-                <Button onClick={fetchStudents} variant="outline">
-                  Try Again
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Loading students...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Students Management</h1>
-          <p className="text-muted-foreground">Manage student registrations</p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Students</h1>
+          <p className="text-gray-600">Manage student registrations</p>
         </div>
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+          Add New Student
+        </button>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Registered Students</CardTitle>
-            <CardDescription>
-              Manage all student registrations and their status
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {students.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No students registered yet.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Age</TableHead>
-                      <TableHead>School</TableHead>
-                      <TableHead>Grade</TableHead>
-                      <TableHead>GPA</TableHead>
-                      <TableHead>Language Level</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Registration Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {students.map((student) => (
-                      <TableRow key={student._id}>
-                        <TableCell>
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Phone
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Target Country
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {students.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                      No students found
+                    </td>
+                  </tr>
+                ) : (
+                  students.map((student) => (
+                    <tr key={student._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
                           {student.firstName} {student.lastName}
-                        </TableCell>
-                        <TableCell>{student.age}</TableCell>
-                        <TableCell>{student.currentSchool}</TableCell>
-                        <TableCell>{student.currentGrade}</TableCell>
-                        <TableCell>{student.highSchoolGPA}</TableCell>
-                        <TableCell>{student.languageLevel}</TableCell>
-                        <TableCell>{student.phone}</TableCell>
-                        <TableCell>{getStatusBadge(student.status)}</TableCell>
-                        <TableCell>{formatDate(student.createdAt)}</TableCell>
-                        <TableCell>
-                          <Select
-                            value={student.status}
-                            onValueChange={(value) => updateStudentStatus(student._id, value)}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="contacted">Contacted</SelectItem>
-                              <SelectItem value="enrolled">Enrolled</SelectItem>
-                              <SelectItem value="rejected">Rejected</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {student.nationality}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {student.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {student.phone}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {student.targetCountry}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(student.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => deleteStudent(student._id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   )

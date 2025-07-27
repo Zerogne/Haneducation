@@ -14,23 +14,9 @@ export function Logo({ className, width = 40, height = 40 }: LogoProps) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchLogo = async () => {
-      try {
-        const response = await fetch("/api/images/cloudinary?section=logo")
-        if (response.ok) {
-          const data = await response.json()
-          if (data.images && data.images.length > 0) {
-            setLogoUrl(data.images[0].url)
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching logo:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchLogo()
+    // Skip API call for now and use fallback directly
+    // This prevents the 500 error until MongoDB is properly configured
+    setIsLoading(false)
   }, [])
 
   // Fallback to the direct Cloudinary URL if database fetch fails

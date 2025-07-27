@@ -1,47 +1,126 @@
 "use client"
 
-import type React from "react"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import { SessionProvider } from "next-auth/react"
+import { useRouter, usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 
-function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession()
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const pathname = usePathname()
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   useEffect(() => {
-    if (status === "loading") return // Still loading
-
-    if (!session) {
+    // If we're on /admin (not /admin/login), redirect to login
+    if (pathname === "/admin") {
       router.push("/admin/login")
     }
-  }, [session, status, router])
+  }, [pathname, router])
 
-  if (status === "loading") {
+  // If we're on /admin, show loading while redirecting
+  if (pathname === "/admin") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Redirecting to login...</p>
         </div>
       </div>
     )
   }
 
-  if (!session) {
-    return null // Will redirect to login
+  // If we're on login page, don't show navbar or sidebar
+  if (pathname === "/admin/login") {
+    return <>{children}</>
   }
 
-  return <>{children}</>
-}
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AdminAuthWrapper>
-      <div className="min-h-screen bg-background">
-        {children}
+    <div className="min-h-screen bg-gray-50">
+      {/* Navbar */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="flex justify-between h-16 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center">
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <h1 className="text-xl font-semibold text-gray-900 ml-4">Admin Panel</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-700">Welcome, Admin</span>
+            <button
+              onClick={() => router.push("/admin/login")}
+              className="text-sm text-red-600 hover:text-red-800"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <div className={`${isSidebarOpen ? 'w-64' : 'w-16'} bg-white shadow-sm transition-all duration-300 ease-in-out`}>
+          <div className="h-full py-4">
+            <nav className="space-y-2 px-3">
+              <a
+                href="/admin/dashboard"
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+                  pathname === "/admin/dashboard" ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                </svg>
+                {isSidebarOpen && <span>Dashboard</span>}
+              </a>
+              <a
+                href="/admin/students"
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+                  pathname === "/admin/students" ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                </svg>
+                {isSidebarOpen && <span>Students</span>}
+              </a>
+              <a
+                href="/admin/images"
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+                  pathname === "/admin/images" ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {isSidebarOpen && <span>Images</span>}
+              </a>
+              <a
+                href="/admin/settings"
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+                  pathname === "/admin/settings" ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {isSidebarOpen && <span>Settings</span>}
+              </a>
+            </nav>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1">
+          <main className="p-6">
+            {children}
+          </main>
+        </div>
       </div>
-    </AdminAuthWrapper>
+    </div>
   )
-}
+} 

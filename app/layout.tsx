@@ -6,6 +6,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LanguageProvider } from "@/contexts/language-context"
+import { SessionProviderWrapper } from "@/components/session-provider"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -22,15 +24,18 @@ export default function RootLayout({
   return (
     <html lang="mn" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <LanguageProvider>
-            <Suspense fallback={null}>
-              {children}
-              <Analytics />
-              <SpeedInsights />
-            </Suspense>
-          </LanguageProvider>
-        </ThemeProvider>
+        <SessionProviderWrapper>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+            <LanguageProvider>
+              <Suspense fallback={null}>
+                {children}
+                <Analytics />
+                <SpeedInsights />
+                <Toaster position="bottom-right" />
+              </Suspense>
+            </LanguageProvider>
+          </ThemeProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   )

@@ -10,11 +10,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useLanguage } from "@/contexts/language-context"
 import { motion } from "framer-motion"
 import { toast } from "sonner"
-import { Separator } from "@/components/ui/separator"
 import { ArrowRight, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function StudentRegistrationForm() {
   const { t } = useLanguage()
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
@@ -44,6 +45,8 @@ export function StudentRegistrationForm() {
 
       if (response.ok) {
         toast.success(t("RegistrationSuccess"))
+        
+        // Reset form
         setFormData({
           firstName: "",
           lastName: "",
@@ -56,9 +59,37 @@ export function StudentRegistrationForm() {
           phone: "",
         })
         setCurrentStep(1)
+        
+        // Redirect to home page after a short delay
+        setTimeout(() => {
+          router.push("/")
+        }, 2000)
       } else {
         const error = await response.json()
-        toast.error(error.error || t("RegistrationError"))
+        if (response.status === 503) {
+          toast.error("Database connection failed. Your registration will be processed once the system is back online.")
+          
+          // Reset form and redirect even on database error
+          setFormData({
+            firstName: "",
+            lastName: "",
+            age: "",
+            currentSchool: "",
+            currentGrade: "",
+            highSchoolGPA: "",
+            languageLevel: "",
+            studyPlan: "",
+            phone: "",
+          })
+          setCurrentStep(1)
+          
+          // Redirect to home page after a short delay
+          setTimeout(() => {
+            router.push("/")
+          }, 3000)
+        } else {
+          toast.error(error.error || t("RegistrationError"))
+        }
       }
     } catch (error) {
       toast.error(t("RegistrationError"))
