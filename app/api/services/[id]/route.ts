@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongoose"
-import Content from "@/models/content"
+import Service from "@/models/service"
 import { getServerSession } from "next-auth/next"
 import { authOptions as rawAuthOptions } from "@/app/api/auth/[...nextauth]/route"
 import type { AuthOptions } from "next-auth"
@@ -15,16 +15,16 @@ export async function GET(
 ) {
   try {
     await connectToDatabase()
-    const content = await Content.findById(params.id)
+    const service = await Service.findById(params.id)
     
-    if (!content) {
-      return NextResponse.json({ error: "Content not found" }, { status: 404 })
+    if (!service) {
+      return NextResponse.json({ error: "Service not found" }, { status: 404 })
     }
     
-    return NextResponse.json({ content })
+    return NextResponse.json({ service })
   } catch (error) {
-    console.error("Error fetching content:", error)
-    return NextResponse.json({ error: "Failed to fetch content" }, { status: 500 })
+    console.error("Error fetching service:", error)
+    return NextResponse.json({ error: "Failed to fetch service" }, { status: 500 })
   }
 }
 
@@ -41,20 +41,20 @@ export async function PUT(
     await connectToDatabase()
     const data = await req.json()
 
-    const content = await Content.findByIdAndUpdate(
+    const service = await Service.findByIdAndUpdate(
       params.id,
       { ...data, updatedAt: new Date() },
       { new: true, runValidators: true }
     )
 
-    if (!content) {
-      return NextResponse.json({ error: "Content not found" }, { status: 404 })
+    if (!service) {
+      return NextResponse.json({ error: "Service not found" }, { status: 404 })
     }
 
-    return NextResponse.json({ content })
+    return NextResponse.json({ service })
   } catch (error) {
-    console.error("Error updating content:", error)
-    return NextResponse.json({ error: "Failed to update content" }, { status: 500 })
+    console.error("Error updating service:", error)
+    return NextResponse.json({ error: "Failed to update service" }, { status: 500 })
   }
 }
 
@@ -69,15 +69,15 @@ export async function DELETE(
     }
 
     await connectToDatabase()
-    const content = await Content.findByIdAndDelete(params.id)
+    const service = await Service.findByIdAndDelete(params.id)
 
-    if (!content) {
-      return NextResponse.json({ error: "Content not found" }, { status: 404 })
+    if (!service) {
+      return NextResponse.json({ error: "Service not found" }, { status: 404 })
     }
 
-    return NextResponse.json({ message: "Content deleted successfully" })
+    return NextResponse.json({ message: "Service deleted successfully" })
   } catch (error) {
-    console.error("Error deleting content:", error)
-    return NextResponse.json({ error: "Failed to delete content" }, { status: 500 })
+    console.error("Error deleting service:", error)
+    return NextResponse.json({ error: "Failed to delete service" }, { status: 500 })
   }
-}
+} 

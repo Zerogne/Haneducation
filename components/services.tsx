@@ -15,6 +15,7 @@ export function Services() {
       description: t("Service1Desc"),
       features: [t("Bachelor"), t("Master"), t("PhD"), t("ProfessionalTraining")],
       color: "bg-blue-500/10 text-blue-600",
+      hoverColor: "group-hover:bg-blue-500/20 group-hover:text-blue-700",
     },
     {
       icon: Languages,
@@ -22,6 +23,7 @@ export function Services() {
       description: t("Service2Desc"),
       features: [t("HSKPrep"), t("LanguageTraining"), t("OnlineClass"), t("DocumentTranslation")],
       color: "bg-green-500/10 text-green-600",
+      hoverColor: "group-hover:bg-green-500/20 group-hover:text-green-700",
     },
     {
       icon: FileText,
@@ -29,6 +31,7 @@ export function Services() {
       description: t("Service3Desc"),
       features: [t("VisaApplication"), t("DocumentTranslation"), t("Notarization"), t("Consulting")],
       color: "bg-purple-500/10 text-purple-600",
+      hoverColor: "group-hover:bg-purple-500/20 group-hover:text-purple-700",
     },
     {
       icon: Award,
@@ -36,6 +39,7 @@ export function Services() {
       description: t("Service4Desc"),
       features: [t("GovScholarship"), t("UniScholarship"), t("ApplicationPrep"), t("InterviewPrep")],
       color: "bg-orange-500/10 text-orange-600",
+      hoverColor: "group-hover:bg-orange-500/20 group-hover:text-orange-700",
     },
     {
       icon: Users,
@@ -43,6 +47,7 @@ export function Services() {
       description: t("Service5Desc"),
       features: [t("CareerConsulting"), t("UniConsulting"), t("CareerAdvice"), t("PrivateConsulting")],
       color: "bg-red-500/10 text-red-600",
+      hoverColor: "group-hover:bg-red-500/20 group-hover:text-red-700",
     },
     {
       icon: BookOpen,
@@ -50,11 +55,12 @@ export function Services() {
       description: t("Service6Desc"),
       features: [t("AcademicSupport"), t("LifeAdvice"), t("EmergencyHelp"), t("GraduationSupport")],
       color: "bg-teal-500/10 text-teal-600",
+      hoverColor: "group-hover:bg-teal-500/20 group-hover:text-teal-700",
     },
   ];
   return (
-    <section id="services" className="py-20">
-      <div className="container px-4">
+    <section id="services" className="py-20 w-full">
+      <div className="max-w-7xl mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -81,20 +87,20 @@ export function Services() {
               transition={{ duration: 0.8, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
-              <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <Card className="h-full group cursor-pointer hover:shadow-lg transition-all duration-300 ease-out hover:-translate-y-1 border hover:border-primary/20 bg-background">
                 <CardHeader>
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${service.color}`}>
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-colors duration-300 ease-out ${service.color} ${service.hoverColor}`}>
                     <service.icon className="h-6 w-6" />
                   </div>
-                  <CardTitle className="text-xl">{service.title}</CardTitle>
-                  <CardDescription>{service.description}</CardDescription>
+                  <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300 ease-out">{service.title}</CardTitle>
+                  <CardDescription className="group-hover:text-foreground transition-colors duration-300 ease-out">{service.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     {service.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        <span className="text-sm text-muted-foreground">{feature}</span>
+                      <div key={featureIndex} className="flex items-center space-x-2 group/item">
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full group-hover/item:scale-125 transition-transform duration-300 ease-out"></div>
+                        <span className="text-sm text-muted-foreground group-hover/item:text-foreground transition-colors duration-300 ease-out">{feature}</span>
                       </div>
                     ))}
                   </div>

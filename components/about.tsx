@@ -27,8 +27,8 @@ export function About() {
   ];
 
   return (
-    <section id="about" className="py-20 bg-muted/30">
-      <div className="container px-4">
+    <section id="about" className="py-20 bg-muted/30 w-full">
+      <div className="max-w-7xl mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -51,12 +51,15 @@ export function About() {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
+            className="group cursor-pointer"
           >
-            <img
-              src="/placeholder.svg?height=400&width=500&text=HAN+Education+Office"
-              alt={t("AboutImageAlt")}
-              className="rounded-2xl shadow-lg"
-            />
+            <div className="relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 ease-out group-hover:shadow-xl group-hover:-translate-y-1">
+              <img
+                src="/placeholder.svg?height=400&width=500&text=HAN+Education+Office"
+                alt={t("AboutImageAlt")}
+                className="rounded-2xl transition-transform duration-300 ease-out group-hover:scale-105"
+              />
+            </div>
           </motion.div>
 
           <motion.div
@@ -70,9 +73,11 @@ export function About() {
 
             <div className="space-y-4">
               {[t("AboutWhy1"), t("AboutWhy2"), t("AboutWhy3"), t("AboutWhy4"), t("AboutWhy5")].map((item, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span className="text-muted-foreground">{item}</span>
+                <div key={index} className="flex items-start space-x-3 group cursor-pointer p-3 rounded-lg hover:bg-primary/5 transition-all duration-300 ease-out">
+                  <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors duration-300 ease-out">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-300 ease-out">{item}</span>
                 </div>
               ))}
             </div>
@@ -88,13 +93,13 @@ export function About() {
               transition={{ duration: 0.8, delay: index * 0.2 }}
               viewport={{ once: true }}
             >
-              <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+              <Card className="h-full group cursor-pointer hover:shadow-lg transition-all duration-300 ease-out hover:-translate-y-1 border hover:border-primary/20 bg-background">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors duration-300 ease-out">
                     <feature.icon className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors duration-300 ease-out">{feature.title}</h3>
+                  <p className="text-muted-foreground group-hover:text-foreground transition-colors duration-300 ease-out">{feature.description}</p>
                 </CardContent>
               </Card>
             </motion.div>

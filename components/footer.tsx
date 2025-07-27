@@ -6,8 +6,8 @@ import { useLanguage } from "@/contexts/language-context";
 export function Footer() {
   const { t } = useLanguage();
   return (
-    <footer className="bg-muted/50 border-t">
-      <div className="container px-4 py-12">
+    <footer className="bg-muted/50 border-t w-full">
+      <div className="max-w-7xl mx-auto px-8 lg:px-16 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">

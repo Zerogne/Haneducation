@@ -8,11 +8,12 @@ import { useLanguage } from "@/contexts/language-context";
 export function Hero() {
   const { t } = useLanguage();
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background gradient */}
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden w-full">
+      {/* Background gradient - full width */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
 
-      <div className="container relative z-10 px-4 py-20">
+      {/* Content container - with spacing */}
+      <div className="max-w-7xl mx-auto px-8 lg:px-16 relative z-10 py-20 w-full">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -35,7 +36,7 @@ export function Hero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-xl text-muted-foreground max-w-2xl"
+                className="text-lg text-muted-foreground max-w-2xl"
               >
                 {t("HeroDescription")}
               </motion.p>
@@ -45,16 +46,16 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4"
             >
-              <Button size="lg" className="group" asChild>
-                <a href="/registration">
+              <Button 
+                size="lg" 
+                className="group relative bg-primary hover:bg-primary/90 transition-all duration-300 ease-out shadow-lg hover:shadow-xl" 
+                asChild
+              >
+                <a href="/registration" className="relative z-10">
                   {t("ApplyNow")}
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" />
                 </a>
-              </Button>
-              <Button size="lg" variant="outline">
-                {t("LearnMore")}
               </Button>
             </motion.div>
 
@@ -62,28 +63,34 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="grid grid-cols-3 gap-8 pt-8"
+              className="grid grid-cols-3 gap-6 pt-4"
             >
-              <div className="text-center">
+              <div className="text-center group cursor-pointer">
                 <div className="flex justify-center mb-2">
-                  <Users className="h-8 w-8 text-primary" />
+                  <div className="p-3 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors duration-300 ease-out">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
                 </div>
-                <div className="text-2xl font-bold">60+</div>
-                <div className="text-sm text-muted-foreground">{t("SuccessfulStudents")}</div>
+                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">60+</div>
+                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">{t("SuccessfulStudents")}</div>
               </div>
-              <div className="text-center">
+              <div className="text-center group cursor-pointer">
                 <div className="flex justify-center mb-2">
-                  <GraduationCap className="h-8 w-8 text-primary" />
+                  <div className="p-3 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors duration-300 ease-out">
+                    <GraduationCap className="h-6 w-6 text-primary" />
+                  </div>
                 </div>
-                <div className="text-2xl font-bold">880+</div>
-                <div className="text-sm text-muted-foreground">{t("PartnerUniversities")}</div>
+                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">880+</div>
+                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">{t("PartnerUniversities")}</div>
               </div>
-              <div className="text-center">
+              <div className="text-center group cursor-pointer">
                 <div className="flex justify-center mb-2">
-                  <Award className="h-8 w-8 text-primary" />
+                  <div className="p-3 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors duration-300 ease-out">
+                    <Award className="h-6 w-6 text-primary" />
+                  </div>
                 </div>
-                <div className="text-2xl font-bold">4+</div>
-                <div className="text-sm text-muted-foreground">{t("YearsExperience")}</div>
+                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">4+</div>
+                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">{t("YearsExperience")}</div>
               </div>
             </motion.div>
           </motion.div>
@@ -92,17 +99,17 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative hidden lg:block"
+            className="relative hidden lg:block group"
           >
-            <div className="relative z-10">
+            <div className="relative z-10 transition-transform duration-500 ease-out group-hover:-translate-y-2">
               <img
                 src="/placeholder.svg?height=600&width=500&text=Students+in+China"
                 alt={t("HeroImageAlt")}
-                className="rounded-2xl shadow-2xl"
+                className="rounded-2xl shadow-2xl transition-shadow duration-500 ease-out group-hover:shadow-3xl"
               />
             </div>
-            <div className="absolute -top-4 -right-4 w-full h-full bg-primary/20 rounded-2xl -z-10" />
-            <div className="absolute -bottom-4 -left-4 w-full h-full bg-secondary/20 rounded-2xl -z-20" />
+            <div className="absolute -top-4 -right-4 w-full h-full bg-primary/20 rounded-2xl -z-10 transition-all duration-500 ease-out group-hover:bg-primary/30" />
+            <div className="absolute -bottom-4 -left-4 w-full h-full bg-secondary/20 rounded-2xl -z-20 transition-all duration-500 ease-out group-hover:bg-secondary/30" />
           </motion.div>
         </div>
       </div>

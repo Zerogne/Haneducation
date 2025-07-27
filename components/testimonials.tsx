@@ -41,8 +41,8 @@ export function Testimonials() {
   ]
 
   return (
-    <section id="testimonials" className="py-20 bg-muted/30">
-      <div className="container px-4">
+    <section id="testimonials" className="py-20 bg-muted/30 w-full">
+      <div className="max-w-7xl mx-auto px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -70,24 +70,29 @@ export function Testimonials() {
               transition={{ duration: 0.8, delay: index * 0.2 }}
               viewport={{ once: true }}
             >
-              <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+              <Card className="h-full group cursor-pointer hover:shadow-lg transition-all duration-300 ease-out hover:-translate-y-1 border hover:border-primary/20 bg-background">
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4 mb-4">
-                    <img
-                      src={testimonial.image || "/placeholder.svg"}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
+                    <div className="relative group/avatar">
+                      <img
+                        src={testimonial.image || "/placeholder.svg"}
+                        alt={testimonial.name}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-primary/20 group-hover/avatar:border-primary transition-colors duration-300 ease-out"
+                      />
+                    </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold">{testimonial.name}</h4>
+                        <h4 className="font-semibold group-hover:text-primary transition-colors duration-300 ease-out">{testimonial.name}</h4>
                         <div className="flex items-center space-x-1">
                           {[...Array(testimonial.rating)].map((_, i) => (
-                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <Star 
+                              key={i} 
+                              className="h-4 w-4 fill-yellow-400 text-yellow-400" 
+                            />
                           ))}
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">
                         {testimonial.university}
                       </p>
                     </div>
@@ -95,7 +100,7 @@ export function Testimonials() {
 
                   <div className="relative">
                     <Quote className="absolute -top-2 -left-2 h-8 w-8 text-primary/20" />
-                    <p className="text-muted-foreground italic pl-6">"{testimonial.content}"</p>
+                    <p className="text-muted-foreground italic pl-6 group-hover:text-foreground transition-colors duration-300 ease-out">"{testimonial.content}"</p>
                   </div>
                 </CardContent>
               </Card>

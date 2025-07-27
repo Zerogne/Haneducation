@@ -4,6 +4,9 @@ import Student from "@/models/student"
 
 export const dynamic = 'force-dynamic'
 
+// Temporary in-memory storage for development
+let tempStudents: any[] = []
+
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase()
@@ -11,7 +14,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ students })
   } catch (error) {
     console.error("Error fetching students:", error)
-    return NextResponse.json({ error: "Failed to fetch students" }, { status: 500 })
+    // Fallback to temporary storage
+    return NextResponse.json({ students: tempStudents })
   }
 }
 
@@ -53,17 +57,43 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error creating student:", error)
     
-    // If it's a database connection error, return a more specific message
-    if (error instanceof Error && error.message.includes('MongoDB')) {
+    // Fallback: Store in temporary memory for development
+    try {
+      const data = await req.json()
+      const processedData = {
+        ...data,
+        age: parseInt(data.age) || 0,
+        highSchoolGPA: parseFloat(data.highSchoolGPA) || 0,
+        _id: Date.now().toString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        status: "pending"
+      }
+
+      // Validate required fields
+      const requiredFields = ['firstName', 'lastName', 'age', 'currentSchool', 'currentGrade', 'highSchoolGPA', 'languageLevel', 'studyPlan', 'phone']
+      const missingFields = requiredFields.filter(field => !processedData[field])
+      
+      if (missingFields.length > 0) {
+        return NextResponse.json({ 
+          error: "Missing required fields", 
+          details: `Missing: ${missingFields.join(', ')}`
+        }, { status: 400 })
+      }
+
+      tempStudents.push(processedData)
+      console.log("Student saved to temporary storage:", processedData)
+
       return NextResponse.json({ 
-        error: "Database connection failed. Please try again later or contact support.",
-        details: error.message
-      }, { status: 503 })
+        student: processedData,
+        message: "Student saved to temporary storage (MongoDB not available)"
+      }, { status: 201 })
+    } catch (fallbackError) {
+      console.error("Fallback error:", fallbackError)
+      return NextResponse.json({ 
+        error: "Failed to create student", 
+        details: "Database connection failed and fallback storage also failed"
+      }, { status: 500 })
     }
-    
-    return NextResponse.json({ 
-      error: "Failed to create student", 
-      details: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 })
   }
 } 

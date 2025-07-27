@@ -1,19 +1,32 @@
 import mongoose, { Schema } from "mongoose"
 
-// Define the Content schema
 const contentSchema = new Schema({
-  key: { type: String, required: true, unique: true },
-  translations: {
-    mn: { type: String, required: true },
-    en: { type: String, required: true },
-    zh: { type: String, required: true },
+  section: { 
+    type: String, 
+    required: true,
+    enum: ["hero", "about", "services", "testimonials", "team", "partners", "contact", "footer"]
   },
-  section: { type: String, required: true },
+  title: { type: String, required: true },
+  subtitle: { type: String, default: "" },
+  content: { type: String, required: true },
+  description: { type: String, default: "" },
+  language: { 
+    type: String, 
+    default: "en",
+    enum: ["en", "mn"]
+  },
+  isActive: { type: Boolean, default: true },
+  order: { type: Number, default: 0 },
+  metadata: {
+    keywords: { type: String, default: "" },
+    ogTitle: { type: String, default: "" },
+    ogDescription: { type: String, default: "" },
+    ogImage: { type: String, default: "" }
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 })
 
-// Create the model if it doesn't exist already
 const Content = mongoose.models.Content || mongoose.model("Content", contentSchema)
 
 export default Content
