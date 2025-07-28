@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { signIn, useSession } from "next-auth/react"
+import { useState, useEffect } from "react"
+import { signIn, useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Lock, User } from "lucide-react"
+import { Logo } from "@/components/ui/logo"
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -16,12 +17,32 @@ export default function AdminLoginPage() {
   const [formData, setFormData] = useState({ username: "", password: "" })
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
-  // Redirect if already logged in
-  if (status === "authenticated" && session) {
-    router.push("/admin/dashboard")
-    return null
-  }
+  // Check authentication status on component mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      // If there's a session but we want to ensure it's valid, we can check it
+      if (status === "authenticated" && session) {
+        // Check if the session has the required admin role
+        if (session.user?.role === "admin") {
+          router.push("/admin/dashboard")
+        } else {
+          // If session exists but user is not admin, sign them out
+          await signOut({ redirect: false })
+          setIsCheckingAuth(false)
+        }
+      } else if (status === "unauthenticated") {
+        // User is not authenticated, show login form
+        setIsCheckingAuth(false)
+      } else if (status === "loading") {
+        // Still loading, keep showing loading state
+        setIsCheckingAuth(true)
+      }
+    }
+
+    checkAuth()
+  }, [status, session, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,8 +58,8 @@ export default function AdminLoginPage() {
 
       if (result?.error) {
         setError("Invalid username or password")
-      } else {
-        // Successful login - redirect will be handled by the session check above
+      } else if (result?.ok) {
+        // Successful login - redirect to dashboard
         router.push("/admin/dashboard")
       }
     } catch (error) {
@@ -49,12 +70,25 @@ export default function AdminLoginPage() {
     }
   }
 
-  if (status === "loading") {
+  // Show loading while checking authentication
+  if (isCheckingAuth || status === "loading") {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If user is already authenticated and has admin role, redirect
+  if (status === "authenticated" && session?.user?.role === "admin") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Redirecting to dashboard...</p>
         </div>
       </div>
     )
@@ -64,8 +98,8 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-            <Lock className="h-6 w-6 text-blue-600" />
+          <div className="flex justify-center mb-4">
+            <Logo width={64} height={64} />
           </div>
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
           <CardDescription>
@@ -136,7 +170,7 @@ export default function AdminLoginPage() {
               Username: <span className="font-mono">admin</span>
             </p>
             <p className="text-sm text-blue-700">
-              Password: <span className="font-mono">admin123</span>
+              Password: <span className="font-mono">HanEducation123@</span>
             </p>
           </div>
         </CardContent>

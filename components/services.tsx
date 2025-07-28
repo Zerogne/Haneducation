@@ -88,17 +88,17 @@ export function Services() {
               viewport={{ once: true }}
             >
               <Card className="h-full group cursor-pointer hover:shadow-lg transition-all duration-300 ease-out hover:-translate-y-1 border hover:border-primary/20 bg-background">
-                <CardHeader>
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-colors duration-300 ease-out ${service.color} ${service.hoverColor}`}>
+                <CardHeader className="pb-4">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-6 transition-colors duration-300 ease-out ${service.color} ${service.hoverColor}`}>
                     <service.icon className="h-6 w-6" />
                   </div>
-                  <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300 ease-out">{service.title}</CardTitle>
-                  <CardDescription className="group-hover:text-foreground transition-colors duration-300 ease-out">{service.description}</CardDescription>
+                  <CardTitle className="text-xl mb-4 group-hover:text-primary transition-colors duration-300 ease-out">{service.title}</CardTitle>
+                  <CardDescription className="group-hover:text-foreground transition-colors duration-300 ease-out leading-relaxed">{service.description}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
                     {service.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center space-x-2 group/item">
+                      <div key={featureIndex} className="flex items-center space-x-3 group/item">
                         <div className="w-1.5 h-1.5 bg-primary rounded-full group-hover/item:scale-125 transition-transform duration-300 ease-out"></div>
                         <span className="text-sm text-muted-foreground group-hover/item:text-foreground transition-colors duration-300 ease-out">{feature}</span>
                       </div>

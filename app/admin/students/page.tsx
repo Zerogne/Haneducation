@@ -81,9 +81,6 @@ export default function StudentsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Students</h1>
           <p className="text-gray-600">Manage student registrations</p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-          Add New Student
-        </button>
       </div>
 
       {error && (

@@ -12,6 +12,7 @@ import { motion } from "framer-motion"
 import { toast } from "sonner"
 import { ArrowRight, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { Logo } from "@/components/ui/logo"
 
 export function StudentRegistrationForm() {
   const { t } = useLanguage()
@@ -116,7 +117,10 @@ export function StudentRegistrationForm() {
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
+      <CardHeader className="text-center">
+        <div className="flex justify-center mb-4">
+          <Logo width={64} height={64} />
+        </div>
         <CardTitle>{t("StudentRegistrationTitle")}</CardTitle>
         <CardDescription>{t("StudentRegistrationDesc")}</CardDescription>
         

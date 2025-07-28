@@ -30,7 +30,7 @@ interface StorageData {
     percentage: number
     transformations: number
     objects: number
-  }
+  } 
 }
 
 export default function StoragePage() {

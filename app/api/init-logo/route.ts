@@ -18,14 +18,14 @@ export async function POST() {
       })
     }
 
-    // Create logo entry
+    // Create logo entry with the new image
     const logoImage = new Image({
-      publicId: "8f4d5273d40a38622a96290a75f72c02",
-      url: "https://res.cloudinary.com/dewhswho9/image/upload/v1753428499/8f4d5273d40a38622a96290a75f72c02_480_nflduc.jpg",
-      secureUrl: "https://res.cloudinary.com/dewhswho9/image/upload/v1753428499/8f4d5273d40a38622a96290a75f72c02_480_nflduc.jpg",
+      publicId: "image-removebg-preview",
+      url: "/image-removebg-preview.png",
+      secureUrl: "/image-removebg-preview.png",
       width: 480,
       height: 480,
-      format: "jpg",
+      format: "png",
       resourceType: "image",
       alt: "HAN Education Logo",
       caption: "HAN Education Logo",

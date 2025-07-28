@@ -2,10 +2,14 @@
 
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+import { useSession, signOut } from "next-auth/react"
+import { Logo } from "@/components/ui/logo"
+import { Loader2 } from "lucide-react"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
+  const { data: session, status } = useSession()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   useEffect(() => {
@@ -15,12 +19,50 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [pathname, router])
 
+  // Protect admin routes (except login)
+  useEffect(() => {
+    if (status === "loading") return // Still loading, wait
+
+    if (status === "unauthenticated" && pathname !== "/admin/login") {
+      // User is not authenticated, redirect to login
+      router.push("/admin/login")
+    } else if (status === "authenticated" && session?.user?.role !== "admin") {
+      // User is authenticated but not admin, sign them out
+      signOut({ redirect: false })
+      router.push("/admin/login")
+    }
+  }, [status, session, pathname, router])
+
   // If we're on /admin, show loading while redirecting
   if (pathname === "/admin") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p>Redirecting to login...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p>Checking authentication...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If user is not authenticated and not on login page, show loading
+  if (status === "unauthenticated" && pathname !== "/admin/login") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
           <p>Redirecting to login...</p>
         </div>
       </div>
@@ -30,6 +72,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // If we're on login page, don't show navbar or sidebar
   if (pathname === "/admin/login") {
     return <>{children}</>
+  }
+
+  // If user is not admin, don't show admin interface
+  if (session?.user?.role !== "admin") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p>Access denied. Redirecting...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false })
+    router.push("/admin/login")
   }
 
   return (
@@ -46,12 +105,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-xl font-semibold text-gray-900 ml-4">Admin Panel</h1>
+            <div className="flex items-center space-x-3 ml-4">
+              <Logo width={32} height={32} />
+              <h1 className="text-xl font-semibold text-gray-900">Admin Panel</h1>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-700">Welcome, Admin</span>
+            <span className="text-sm text-gray-700">Welcome, {session?.user?.name || 'Admin'}</span>
             <button
-              onClick={() => router.push("/admin/login")}
+              onClick={handleLogout}
               className="text-sm text-red-600 hover:text-red-800"
             >
               Logout
@@ -88,6 +150,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {isSidebarOpen && <span>Students</span>}
               </a>
               <a
+                href="/admin/team"
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+                  pathname === "/admin/team" ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {isSidebarOpen && <span>Team</span>}
+              </a>
+              <a
+                href="/admin/content"
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+                  pathname === "/admin/content" ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                {isSidebarOpen && <span>Content</span>}
+              </a>
+              <a
                 href="/admin/images"
                 className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
                   pathname === "/admin/images" ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -114,11 +198,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1">
-          <main className="p-6">
-            {children}
-          </main>
+        {/* Main content */}
+        <div className="flex-1 p-8">
+          {children}
         </div>
       </div>
     </div>

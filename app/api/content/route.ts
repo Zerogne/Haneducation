@@ -1,106 +1,150 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongoose"
 import Content from "@/models/content"
-import { getServerSession } from "next-auth/next"
-import { authOptions as rawAuthOptions } from "@/app/api/auth/[...nextauth]/route"
-import type { AuthOptions } from "next-auth"
-
-const authOptions = rawAuthOptions as AuthOptions
 
 export const dynamic = 'force-dynamic'
 
-// Temporary mock data for development
-const mockContents = [
-  {
-    _id: "1",
-    section: "hero",
-    title: "Welcome to HAN Education",
-    content: "Your gateway to studying in China with scholarships",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: "2",
-    section: "about",
-    title: "About Our Services",
-    content: "We provide comprehensive educational consulting services",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-]
-
-export async function GET(req: NextRequest) {
+// GET - Fetch all content or specific section
+export async function GET(request: NextRequest) {
   try {
     await connectToDatabase()
+    
+    const { searchParams } = new URL(request.url)
+    const section = searchParams.get('section')
 
-    const section = req.nextUrl.searchParams.get("section")
-    const query = section ? { section } : {}
+    let query = {}
+    if (section) {
+      query = { section }
+    }
 
-    const contents = await Content.find(query)
-    return NextResponse.json({ contents })
+    const content = await Content.find(query)
+      .sort({ order: 1, createdAt: 1 })
+      .lean()
+
+    return NextResponse.json({ 
+      success: true, 
+      content 
+    })
   } catch (error) {
     console.error("Error fetching content:", error)
-    
-    // Fallback: Return mock data for development
-    const section = req.nextUrl.searchParams.get("section")
-    const filteredContents = section 
-      ? mockContents.filter(content => content.section === section)
-      : mockContents
-    
-    console.log("Returning mock content:", filteredContents.length)
-    
-    return NextResponse.json({ 
-      contents: filteredContents,
-      message: "Using mock data (MongoDB not available)"
-    })
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch content" }, 
+      { status: 500 }
+    )
   }
 }
 
-export async function POST(req: NextRequest) {
+// POST - Create new content
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     await connectToDatabase()
-    const data = await req.json()
+    
+    const body = await request.json()
+    
+    const newContent = new Content({
+      section: body.section,
+      title: body.title,
+      description: body.description,
+      content: body.content,
+      order: body.order || 0,
+      isActive: body.isActive !== false,
+      metadata: body.metadata || {}
+    })
 
-    const content = new Content(data)
-    await content.save()
+    await newContent.save()
 
-    return NextResponse.json({ content }, { status: 201 })
+    return NextResponse.json({ 
+      success: true, 
+      message: "Content created successfully",
+      content: newContent 
+    })
   } catch (error) {
     console.error("Error creating content:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to create content" }, 
+      { status: 500 }
+    )
+  }
+}
+
+// PUT - Update content
+export async function PUT(request: NextRequest) {
+  try {
+    await connectToDatabase()
     
-    // Fallback: Store in temporary memory for development
-    try {
-      const session = await getServerSession(authOptions)
-      if (!session) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-      }
+    const body = await request.json()
+    const { id, ...updateData } = body
 
-      const data = await req.json()
-      const processedData = {
-        ...data,
-        _id: Date.now().toString(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-
-      mockContents.push(processedData)
-      console.log("Content saved to temporary storage:", processedData)
-
-      return NextResponse.json({ 
-        content: processedData,
-        message: "Content saved to temporary storage (MongoDB not available)"
-      }, { status: 201 })
-    } catch (fallbackError) {
-      console.error("Fallback error:", fallbackError)
-      return NextResponse.json({ 
-        error: "Failed to create content", 
-        details: "Database connection failed and fallback storage also failed"
-      }, { status: 500 })
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Content ID is required" }, 
+        { status: 400 }
+      )
     }
+
+    const updatedContent = await Content.findByIdAndUpdate(
+      id,
+      {
+        ...updateData,
+        updatedAt: new Date()
+      },
+      { new: true }
+    )
+
+    if (!updatedContent) {
+      return NextResponse.json(
+        { success: false, error: "Content not found" }, 
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: "Content updated successfully",
+      content: updatedContent 
+    })
+  } catch (error) {
+    console.error("Error updating content:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to update content" }, 
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE - Delete content
+export async function DELETE(request: NextRequest) {
+  try {
+    await connectToDatabase()
+    
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Content ID is required" }, 
+        { status: 400 }
+      )
+    }
+
+    const deletedContent = await Content.findByIdAndDelete(id)
+
+    if (!deletedContent) {
+      return NextResponse.json(
+        { success: false, error: "Content not found" }, 
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: "Content deleted successfully" 
+    })
+  } catch (error) {
+    console.error("Error deleting content:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to delete content" }, 
+      { status: 500 }
+    )
   }
 }

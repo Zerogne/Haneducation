@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { Facebook, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react"
 import { useLanguage } from "@/contexts/language-context";
+import { Logo } from "@/components/ui/logo";
 
 export function Footer() {
   const { t } = useLanguage();
@@ -11,9 +12,7 @@ export function Footer() {
         <div className="grid md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">HAN</span>
-              </div>
+              <Logo width={32} height={32} />
               <span className="font-bold text-xl">HAN Education</span>
             </div>
             <p className="text-muted-foreground">

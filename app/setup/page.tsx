@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle, AlertCircle } from "lucide-react"
+import { Logo } from "@/components/ui/logo"
 
 export default function SetupPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -50,7 +51,10 @@ export default function SetupPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <Logo width={64} height={64} />
+          </div>
           <CardTitle>Admin Setup</CardTitle>
           <CardDescription>Initialize the admin user for the first time</CardDescription>
         </CardHeader>

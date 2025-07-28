@@ -28,6 +28,7 @@ export default function Header() {
     mn: {
       home: "Нүүр",
       about: "Бидний тухай",
+      whyChina: "Хятад дахь боловсрол",
       services: "Үйлчилгээ",
       team: "Багийн гишүүд",
       contact: "Холбоо барих",
@@ -35,6 +36,7 @@ export default function Header() {
     en: {
       home: "Home",
       about: "About",
+      whyChina: "Study in China",
       services: "Services",
       team: "Team",
       contact: "Contact",
@@ -42,6 +44,7 @@ export default function Header() {
     zh: {
       home: "主页",
       about: "关于我们",
+      whyChina: "在中国学习",
       services: "服务",
       team: "团队",
       contact: "联系",
@@ -67,6 +70,9 @@ export default function Header() {
             </Link>
             <Link href="#about" className="text-sm font-medium transition-colors hover:text-primary">
               {t.about}
+            </Link>
+            <Link href="#why-china" className="text-sm font-medium transition-colors hover:text-primary">
+              {t.whyChina}
             </Link>
             <Link href="#services" className="text-sm font-medium transition-colors hover:text-primary">
               {t.services}
@@ -165,6 +171,13 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.about}
+              </Link>
+              <Link
+                href="#why-china"
+                className="text-sm font-medium transition-colors hover:text-primary"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {t.whyChina}
               </Link>
               <Link
                 href="#services"

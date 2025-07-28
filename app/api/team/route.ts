@@ -1,102 +1,150 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongoose"
 import Team from "@/models/team"
-import { getServerSession } from "next-auth/next"
-import { authOptions as rawAuthOptions } from "@/app/api/auth/[...nextauth]/route"
-import type { AuthOptions } from "next-auth"
 
-const authOptions = rawAuthOptions as AuthOptions
-
-// Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-// Temporary mock data for development
-const mockTeam = [
-  {
-    _id: "1",
-    name: "Б.Мөнхзул",
-    role: "Director",
-    email: "monkhzul@haneducation.mn",
-    phone: "+976 7777 7777",
-    image: "/placeholder.svg?height=200&width=200&text=БМ",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: "2",
-    name: "Ө.Мөнгөнзул",
-    role: "Advisor",
-    email: "mungunzul@haneducation.mn",
-    phone: "+976 7777 7778",
-    image: "/placeholder.svg?height=200&width=200&text=ӨМ",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-]
-
-export async function GET(req: NextRequest) {
+// GET - Fetch all team members
+export async function GET() {
   try {
     await connectToDatabase()
-    const team = await Team.find({})
-    return NextResponse.json({ team })
-  } catch (error) {
-    console.error("Error fetching team:", error)
     
-    // Fallback: Return mock data for development
-    console.log("Returning mock team data")
-    
+    const teamMembers = await Team.find({ isActive: true })
+      .sort({ order: 1, createdAt: 1 })
+      .lean()
+
     return NextResponse.json({ 
-      team: mockTeam,
-      message: "Using mock data (MongoDB not available)"
+      success: true, 
+      team: teamMembers 
     })
+  } catch (error) {
+    console.error("Error fetching team members:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch team members" }, 
+      { status: 500 }
+    )
   }
 }
 
-export async function POST(req: NextRequest) {
+// POST - Create new team member
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     await connectToDatabase()
-    const data = await req.json()
+    
+    const body = await request.json()
+    
+    const newTeamMember = new Team({
+      name: body.name,
+      role: body.role,
+      email: body.email,
+      phone: body.phone,
+      image: body.image || "",
+      linkedin: body.linkedin || "",
+      bio: body.bio || "",
+      department: body.department || "general",
+      order: body.order || 0,
+      metadata: {
+        experience: body.experience || "",
+        education: body.education || "",
+        languages: body.languages || [],
+        specializations: body.specializations || []
+      }
+    })
 
-    const member = new Team(data)
-    await member.save()
+    await newTeamMember.save()
 
-    return NextResponse.json({ member }, { status: 201 })
+    return NextResponse.json({ 
+      success: true, 
+      message: "Team member created successfully",
+      teamMember: newTeamMember 
+    })
   } catch (error) {
     console.error("Error creating team member:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to create team member" }, 
+      { status: 500 }
+    )
+  }
+}
+
+// PUT - Update team member
+export async function PUT(request: NextRequest) {
+  try {
+    await connectToDatabase()
     
-    // Fallback: Store in temporary memory for development
-    try {
-      const session = await getServerSession(authOptions)
-      if (!session) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-      }
+    const body = await request.json()
+    const { id, ...updateData } = body
 
-      const data = await req.json()
-      const processedData = {
-        ...data,
-        _id: Date.now().toString(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-
-      mockTeam.push(processedData)
-      console.log("Team member saved to temporary storage:", processedData)
-
-      return NextResponse.json({ 
-        member: processedData,
-        message: "Team member saved to temporary storage (MongoDB not available)"
-      }, { status: 201 })
-    } catch (fallbackError) {
-      console.error("Fallback error:", fallbackError)
-      return NextResponse.json({ 
-        error: "Failed to create team member", 
-        details: "Database connection failed and fallback storage also failed"
-      }, { status: 500 })
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Team member ID is required" }, 
+        { status: 400 }
+      )
     }
+
+    const updatedTeamMember = await Team.findByIdAndUpdate(
+      id,
+      {
+        ...updateData,
+        updatedAt: new Date()
+      },
+      { new: true }
+    )
+
+    if (!updatedTeamMember) {
+      return NextResponse.json(
+        { success: false, error: "Team member not found" }, 
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: "Team member updated successfully",
+      teamMember: updatedTeamMember 
+    })
+  } catch (error) {
+    console.error("Error updating team member:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to update team member" }, 
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE - Delete team member
+export async function DELETE(request: NextRequest) {
+  try {
+    await connectToDatabase()
+    
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Team member ID is required" }, 
+        { status: 400 }
+      )
+    }
+
+    const deletedTeamMember = await Team.findByIdAndDelete(id)
+
+    if (!deletedTeamMember) {
+      return NextResponse.json(
+        { success: false, error: "Team member not found" }, 
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: "Team member deleted successfully" 
+    })
+  } catch (error) {
+    console.error("Error deleting team member:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to delete team member" }, 
+      { status: 500 }
+    )
   }
 }

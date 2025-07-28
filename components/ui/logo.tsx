@@ -19,8 +19,8 @@ export function Logo({ className, width = 40, height = 40 }: LogoProps) {
     setIsLoading(false)
   }, [])
 
-  // Fallback to the direct Cloudinary URL if database fetch fails
-  const fallbackUrl = "https://res.cloudinary.com/dewhswho9/image/upload/v1753428499/8f4d5273d40a38622a96290a75f72c02_480_nflduc.jpg"
+  // Use the new logo image from public folder
+  const fallbackUrl = "/image-removebg-preview.png"
 
   if (isLoading) {
     return (

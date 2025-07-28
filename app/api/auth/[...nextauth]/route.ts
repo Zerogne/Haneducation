@@ -17,16 +17,6 @@ const authOptions = {
           throw new Error("Missing username or password")
         }
 
-        // Temporary hardcoded admin for development (remove in production)
-        if (credentials.username === "admin" && credentials.password === "admin123") {
-          return {
-            id: "1",
-            name: "Administrator",
-            email: "admin@han-education.com",
-            role: "admin",
-          }
-        }
-
         try {
           await connectToDatabase()
 
@@ -45,9 +35,10 @@ const authOptions = {
             role: user.role,
           }
         } catch (error) {
-          console.error("Database connection failed, using fallback admin")
-          // If database fails, still allow admin login
-          if (credentials.username === "admin" && credentials.password === "admin123") {
+          console.error("Authentication error:", error)
+          
+          // Fallback for development - check against the new password
+          if (credentials.username === "admin" && credentials.password === "HanEducation123@") {
             return {
               id: "1",
               name: "Administrator",
@@ -55,6 +46,7 @@ const authOptions = {
               role: "admin",
             }
           }
+          
           throw new Error("Invalid username or password")
         }
       },
