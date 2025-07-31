@@ -4,24 +4,58 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { 
-  Users, 
+  Users,
   Image, 
   FileText, 
   Settings, 
-  GraduationCap, 
-  MessageSquare, 
-  Building, 
-  UserCheck,
-  Upload,
+  GraduationCap,
+  Building,
   Database,
   BarChart3
 } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
+import { useState, useEffect } from "react"
+
+interface AnalyticsData {
+  students: number
+  services: number
+  testimonials: number
+  team: number
+  partners: number
+  images: number
+  content: number
+  storage: {
+    used: number
+    total: number
+    percentage: number
+  }
+}
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession()
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchAnalytics()
+  }, [])
+
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/analytics')
+      if (response.ok) {
+        const data = await response.json()
+        setAnalytics(data)
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (status === "loading") {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>
@@ -31,46 +65,21 @@ export default function AdminDashboard() {
     redirect("/admin/login")
   }
 
+  const formatStorage = (gb: number) => {
+    if (gb < 1) {
+      return `${Math.round(gb * 1024)} MB`
+    }
+    return `${gb.toFixed(2)} GB`
+  }
+
   const adminSections = [
     {
-      title: "Students",
-      description: "Manage student registrations and applications",
-      icon: Users,
-      href: "/admin/students",
-      color: "bg-blue-500",
-      count: "60+"
-    },
-    {
-      title: "Services",
-      description: "Edit service cards and features",
-      icon: GraduationCap,
-      href: "/admin/services",
-      color: "bg-green-500",
-      count: "6"
-    },
-    {
-      title: "Testimonials",
-      description: "Manage customer testimonials",
-      icon: MessageSquare,
-      href: "/admin/testimonials",
-      color: "bg-purple-500",
-      count: "4"
-    },
-    {
-      title: "Team",
-      description: "Edit team member information",
-      icon: UserCheck,
-      href: "/admin/team",
-      color: "bg-orange-500",
-      count: "3"
-    },
-    {
-      title: "Partners",
-      description: "Manage partner universities",
-      icon: Building,
-      href: "/admin/partners",
-      color: "bg-red-500",
-      count: "6"
+      title: "Content",
+      description: "Edit website content, team members, and testimonials",
+      icon: FileText,
+      href: "/admin/content",
+      color: "bg-indigo-500",
+      count: analytics ? `${analytics.content}` : "0"
     },
     {
       title: "Images",
@@ -78,23 +87,7 @@ export default function AdminDashboard() {
       icon: Image,
       href: "/admin/images",
       color: "bg-teal-500",
-      count: "12"
-    },
-    {
-      title: "Content",
-      description: "Edit website content and text",
-      icon: FileText,
-      href: "/admin/content",
-      color: "bg-indigo-500",
-      count: "8"
-    },
-    {
-      title: "Upload",
-      description: "Upload new images to Cloudinary",
-      icon: Upload,
-      href: "/admin/upload",
-      color: "bg-pink-500",
-      count: "New"
+      count: analytics ? `${analytics.images}` : "0"
     },
     {
       title: "Analytics",
@@ -123,27 +116,29 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-2">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">
             Welcome back, {session.user?.name}. Manage your website content from here.
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Students</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">60+</div>
+              <div className="text-2xl font-bold">
+                {loading ? "..." : analytics ? analytics.students : 0}
+              </div>
               <p className="text-xs text-muted-foreground">
-                +12% from last month
+                Registered students
               </p>
             </CardContent>
           </Card>
@@ -154,9 +149,11 @@ export default function AdminDashboard() {
               <GraduationCap className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">6</div>
+              <div className="text-2xl font-bold">
+                {loading ? "..." : analytics ? analytics.services : 0}
+              </div>
               <p className="text-xs text-muted-foreground">
-                All services active
+                Available services
               </p>
             </CardContent>
           </Card>
@@ -167,9 +164,11 @@ export default function AdminDashboard() {
               <Building className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">6</div>
+              <div className="text-2xl font-bold">
+                {loading ? "..." : analytics ? analytics.partners : 0}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Premium partnerships
+                Partner institutions
               </p>
             </CardContent>
           </Card>
@@ -180,28 +179,55 @@ export default function AdminDashboard() {
               <Database className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0.15 GB</div>
+              <div className="text-2xl font-bold">
+                {loading ? "..." : analytics ? formatStorage(analytics.storage.used) : "0 MB"}
+              </div>
               <p className="text-xs text-muted-foreground">
-                3% of 5GB total
+                {analytics ? `${analytics.storage.percentage}%` : "0%"} of {analytics ? formatStorage(analytics.storage.total) : "512 MB"}
               </p>
             </CardContent>
           </Card>
         </div>
 
+                {/* Quick Actions */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+          <div className="flex flex-wrap gap-4">
+            <Button asChild>
+              <Link href="/admin/content">
+                <FileText className="h-4 w-4 mr-2" />
+                Edit Content
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/admin/images">
+                <Image className="h-4 w-4 mr-2" />
+                Manage Images
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/admin/analytics">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                View Analytics
+              </Link>
+            </Button>
+          </div>
+        </div>
+
         {/* Management Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {adminSections.map((section) => (
             <Link key={section.title} href={section.href}>
-              <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
+              <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group h-48">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className={`p-3 rounded-lg ${section.color} text-white group-hover:scale-110 transition-transform duration-300`}>
                       <section.icon className="h-6 w-6" />
-                </div>
+                    </div>
                     <Badge variant="secondary" className="text-xs">
                       {section.count}
                     </Badge>
-              </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <CardTitle className="text-lg mb-2 group-hover:text-blue-600 transition-colors duration-300">
@@ -214,37 +240,6 @@ export default function AdminDashboard() {
               </Card>
             </Link>
           ))}
-      </div>
-
-      {/* Quick Actions */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-          <div className="flex flex-wrap gap-4">
-            <Button asChild>
-              <Link href="/admin/upload">
-                <Upload className="h-4 w-4 mr-2" />
-                Upload New Image
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/admin/students">
-                <Users className="h-4 w-4 mr-2" />
-                View Students
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/admin/services">
-                <GraduationCap className="h-4 w-4 mr-2" />
-                Edit Services
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/admin/content">
-                <FileText className="h-4 w-4 mr-2" />
-                Edit Content
-              </Link>
-            </Button>
-          </div>
         </div>
       </div>
     </div>

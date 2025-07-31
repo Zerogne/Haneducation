@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongoose"
 import Service from "@/models/service"
 import { getServerSession } from "next-auth/next"
-import { authOptions as rawAuthOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions as rawAuthOptions } from "@/lib/auth"
 import type { AuthOptions } from "next-auth"
 
 const authOptions = rawAuthOptions as AuthOptions
@@ -101,21 +101,33 @@ export async function GET(req: NextRequest) {
   try {
     await connectToDatabase()
     const language = req.nextUrl.searchParams.get("language") || "en"
-    const query = { language, isActive: true }
     
-    const services = await Service.find(query).sort({ order: 1 })
+    // First try to get services for the requested language
+    let query = { language, isActive: true }
+    let services = await Service.find(query).sort({ order: 1 })
+    
+    // If no services found for the requested language, fall back to Mongolian
+    if (services.length === 0 && language !== "mn") {
+      console.log(`No services found for language ${language}, falling back to Mongolian`)
+      query = { language: "mn", isActive: true }
+      services = await Service.find(query).sort({ order: 1 })
+    }
+    
     return NextResponse.json({ services })
   } catch (error) {
     console.error("Error fetching services:", error)
     
     // Fallback: Return mock data for development
-    const language = req.nextUrl.searchParams.get("language") || "en"
+    const language = req.nextUrl.searchParams.get("language") || "mn"
     const filteredServices = mockServices.filter(service => service.language === language)
     
-    console.log("Returning mock services:", filteredServices.length)
+    // If no services for requested language, return Mongolian services
+    const servicesToReturn = filteredServices.length > 0 ? filteredServices : mockServices.filter(service => service.language === "mn")
+    
+    console.log("Returning mock services:", servicesToReturn.length)
     
     return NextResponse.json({ 
-      services: filteredServices,
+      services: servicesToReturn,
       message: "Using mock data (MongoDB not available)"
     })
   }

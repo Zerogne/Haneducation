@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Header from "@/components/header"
-import { useLanguage } from "@/contexts/language-context"
+// Removed: import { useLanguage } from "@/contexts/language-context"
 
 export default function RegistrationPage() {
-  const { t } = useLanguage()
+  // Removed: const { t } = useLanguage()
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -22,7 +22,7 @@ export default function RegistrationPage() {
           <Link href="/">
             <Button variant="outline" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
-              {t("BackToHome")}
+              Буцах
             </Button>
           </Link>
         </div>
@@ -30,10 +30,10 @@ export default function RegistrationPage() {
         {/* Page Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t("StudentRegistrationTitle")}
+            Оюутны бүртгэл
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            {t("RegistrationPageDescription")}
+            Хятадад суралцах хүсэлтээ илгээх
           </p>
         </div>
 

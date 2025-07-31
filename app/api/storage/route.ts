@@ -27,9 +27,9 @@ export async function GET(req: NextRequest) {
 
     // Estimate storage usage (rough calculation)
     const estimatedStorageGB = (studentsCount * 0.001 + contentCount * 0.002 + imagesCount * 0.005)
-    const totalStorageGB = 5.0 // Assuming 5GB limit
+    const totalStorageGB = 0.512 // MongoDB Atlas free tier: 512MB
     const mongoDbStorage = {
-      used: Math.round(estimatedStorageGB * 100) / 100,
+      used: Math.round(estimatedStorageGB * 1000) / 1000, // GB
       total: totalStorageGB,
       percentage: Math.round((estimatedStorageGB / totalStorageGB) * 100),
     }
@@ -67,9 +67,9 @@ export async function GET(req: NextRequest) {
     // Fallback: Return mock storage data for development
     const mockStorageData = {
       mongodb: {
-        used: 0.15, // GB
-        total: 5.0, // GB
-        percentage: 3,
+        used: 0.001, // GB
+        total: 0.512, // GB (512MB)
+        percentage: 0.2,
       },
       cloudinary: {
         used: 25, // MB

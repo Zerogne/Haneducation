@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useLanguage } from "@/contexts/language-context"
+
 import { motion } from "framer-motion"
 import { toast } from "sonner"
 import { ArrowRight, ArrowLeft } from "lucide-react"
@@ -15,13 +15,12 @@ import { useRouter } from "next/navigation"
 import { Logo } from "@/components/ui/logo"
 
 export function StudentRegistrationForm() {
-  const { t } = useLanguage()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    fullName: "",
+    email: "",
     age: "",
     currentSchool: "",
     currentGrade: "",
@@ -45,12 +44,12 @@ export function StudentRegistrationForm() {
       })
 
       if (response.ok) {
-        toast.success(t("RegistrationSuccess"))
+        toast.success("Бүртгэл амжилттай илгээгдлээ!")
         
         // Reset form
         setFormData({
-          firstName: "",
-          lastName: "",
+          fullName: "",
+          email: "",
           age: "",
           currentSchool: "",
           currentGrade: "",
@@ -72,8 +71,8 @@ export function StudentRegistrationForm() {
           
           // Reset form and redirect even on database error
           setFormData({
-            firstName: "",
-            lastName: "",
+            fullName: "",
+            email: "",
             age: "",
             currentSchool: "",
             currentGrade: "",
@@ -89,11 +88,11 @@ export function StudentRegistrationForm() {
             router.push("/")
           }, 3000)
         } else {
-          toast.error(error.error || t("RegistrationError"))
+          toast.error(error.error || "Бүртгэл илгээхэд алдаа гарлаа")
         }
       }
     } catch (error) {
-      toast.error(t("RegistrationError"))
+      toast.error("Бүртгэл илгээхэд алдаа гарлаа")
     } finally {
       setIsLoading(false)
     }
@@ -112,7 +111,7 @@ export function StudentRegistrationForm() {
   }
 
   const isStep1Valid = () => {
-    return formData.firstName && formData.lastName && formData.age && formData.phone && formData.currentSchool && formData.currentGrade
+    return formData.fullName && formData.email && formData.age && formData.phone && formData.currentSchool && formData.currentGrade
   }
 
   return (
@@ -121,8 +120,8 @@ export function StudentRegistrationForm() {
         <div className="flex justify-center mb-4">
           <Logo width={64} height={64} />
         </div>
-        <CardTitle>{t("StudentRegistrationTitle")}</CardTitle>
-        <CardDescription>{t("StudentRegistrationDesc")}</CardDescription>
+        <CardTitle>Оюутны бүртгэл</CardTitle>
+        <CardDescription>Хятадад суралцах хүсэлтээ илгээх</CardDescription>
         
         {/* Progress Indicator */}
         <div className="flex items-center justify-center space-x-4 mt-4">
@@ -130,14 +129,14 @@ export function StudentRegistrationForm() {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${currentStep >= 1 ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
               1
             </div>
-            <span className="ml-2 text-sm font-medium">{t("PersonalInfo")}</span>
+            <span className="ml-2 text-sm font-medium">Хувийн мэдээлэл</span>
           </div>
           <div className={`w-16 h-0.5 ${currentStep >= 2 ? 'bg-primary' : 'bg-gray-300'}`}></div>
           <div className={`flex items-center ${currentStep >= 2 ? 'text-primary' : 'text-gray-400'}`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${currentStep >= 2 ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
               2
             </div>
-            <span className="ml-2 text-sm font-medium">{t("AcademicInfo")}</span>
+            <span className="ml-2 text-sm font-medium">Академик мэдээлэл</span>
           </div>
         </div>
       </CardHeader>
@@ -153,29 +152,31 @@ export function StudentRegistrationForm() {
             >
               <div className="border-b pb-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {t("PersonalInformation")}
+                  Хувийн мэдээлэл
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {t("PersonalInformationDesc")}
+                  Өөрийн хувийн мэдээллээ оруулна уу
                 </p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">{t("FirstName")}</Label>
+                  <Label htmlFor="fullName">Нэр</Label>
                   <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleChange("firstName", e.target.value)}
+                    id="fullName"
+                    value={formData.fullName}
+                    onChange={(e) => handleChange("fullName", e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">{t("LastName")}</Label>
+                  <Label htmlFor="email">Gmail</Label>
                   <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleChange("lastName", e.target.value)}
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                    placeholder="your.email@gmail.com"
                     required
                   />
                 </div>
@@ -183,7 +184,7 @@ export function StudentRegistrationForm() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="age">{t("Age")}</Label>
+                  <Label htmlFor="age">Нас</Label>
                   <Input
                     id="age"
                     type="number"
@@ -195,7 +196,7 @@ export function StudentRegistrationForm() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">{t("Phone")}</Label>
+                  <Label htmlFor="phone">Утас</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -208,28 +209,28 @@ export function StudentRegistrationForm() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="currentSchool">{t("CurrentSchool")}</Label>
+                  <Label htmlFor="currentSchool">Сургууль</Label>
                   <Input
                     id="currentSchool"
                     value={formData.currentSchool}
                     onChange={(e) => handleChange("currentSchool", e.target.value)}
-                    placeholder={t("CurrentSchoolPlaceholder")}
+                    placeholder="Одоо сурч буй сургууль"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="currentGrade">{t("CurrentGrade")}</Label>
+                  <Label htmlFor="currentGrade">Анги</Label>
                   <Select value={formData.currentGrade} onValueChange={(value) => handleChange("currentGrade", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder={t("SelectCurrentGrade")} />
+                      <SelectValue placeholder="Одоо сурч буй анги" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="9">{t("Grade9")}</SelectItem>
-                      <SelectItem value="10">{t("Grade10")}</SelectItem>
-                      <SelectItem value="11">{t("Grade11")}</SelectItem>
-                      <SelectItem value="12">{t("Grade12")}</SelectItem>
-                      <SelectItem value="bachelor">{t("Bachelor")}</SelectItem>
-                      <SelectItem value="master">{t("Master")}</SelectItem>
+                      <SelectItem value="9">9-р анги</SelectItem>
+                      <SelectItem value="10">10-р анги</SelectItem>
+                      <SelectItem value="11">11-р анги</SelectItem>
+                      <SelectItem value="12">12-р анги</SelectItem>
+                      <SelectItem value="bachelor">Бакалавр</SelectItem>
+                      <SelectItem value="master">Магистр</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -242,7 +243,7 @@ export function StudentRegistrationForm() {
                   disabled={!isStep1Valid()}
                   className="flex items-center gap-2"
                 >
-                  {t("Continue")}
+                  Үргэлжлүүлэх
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -257,16 +258,16 @@ export function StudentRegistrationForm() {
             >
               <div className="border-b pb-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {t("AcademicInformation")}
+                  Академик мэдээлэл
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {t("AcademicInformationDesc")}
+                  Сургалтын талаарх мэдээллээ оруулна уу
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="highSchoolGPA">{t("HighSchoolGPA")}</Label>
+                  <Label htmlFor="highSchoolGPA">Голч дүн</Label>
                   <Input
                     id="highSchoolGPA"
                     type="number"
@@ -275,33 +276,32 @@ export function StudentRegistrationForm() {
                     max="4"
                     value={formData.highSchoolGPA}
                     onChange={(e) => handleChange("highSchoolGPA", e.target.value)}
-                    placeholder={t("HighSchoolGPAPlaceholder")}
+                    placeholder="Голч дүн (0-4.0)"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="languageLevel">{t("LanguageLevel")}</Label>
+                  <Label htmlFor="languageLevel">Хэлний түвшин</Label>
                   <Select value={formData.languageLevel} onValueChange={(value) => handleChange("languageLevel", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder={t("SelectLanguageLevel")} />
+                      <SelectValue placeholder="Хэлний түвшин" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="beginner">{t("Beginner")}</SelectItem>
-                      <SelectItem value="intermediate">{t("Intermediate")}</SelectItem>
-                      <SelectItem value="advanced">{t("Advanced")}</SelectItem>
-                      <SelectItem value="native">{t("Native")}</SelectItem>
+                      <SelectItem value="beginner">Анхан шат</SelectItem>
+                      <SelectItem value="intermediate">Дунд шат</SelectItem>
+                      <SelectItem value="advanced">Ахисан шат</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="studyPlan">{t("StudyPlan")}</Label>
+                <Label htmlFor="studyPlan">Суралцах төлөвлөгөө</Label>
                 <Textarea
                   id="studyPlan"
                   value={formData.studyPlan}
                   onChange={(e) => handleChange("studyPlan", e.target.value)}
-                  placeholder={t("StudyPlanPlaceholder")}
+                  placeholder="Суралцах зорилго, төлөвлөгөөгөө бичнэ үү"
                   rows={4}
                   required
                 />
@@ -315,10 +315,10 @@ export function StudentRegistrationForm() {
                   className="flex items-center gap-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  {t("Back")}
+                  Буцах
                 </Button>
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? t("Submitting") : t("SubmitApplication")}
+                  {isLoading ? "Илгээж байна..." : "Бүртгэлийг илгээх"}
                 </Button>
               </div>
             </motion.div>

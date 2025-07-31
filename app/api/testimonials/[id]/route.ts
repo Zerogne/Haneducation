@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongoose"
 import Testimonial from "@/models/testimonial"
 import { getServerSession } from "next-auth/next"
-import { authOptions as rawAuthOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions as rawAuthOptions } from "@/lib/auth"
 import type { AuthOptions } from "next-auth"
 
 const authOptions = rawAuthOptions as AuthOptions

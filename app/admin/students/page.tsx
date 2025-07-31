@@ -1,166 +1,224 @@
 "use client"
 
+import { useSession } from "next-auth/react"
 import { useState, useEffect } from "react"
+import { useToast } from "@/hooks/use-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 interface Student {
   _id: string
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  dateOfBirth: string
-  nationality: string
-  currentSchool: string
-  grade: string
-  intendedMajor: string
-  targetCountry: string
-  targetUniversity: string
-  budget: string
-  timeline: string
-  createdAt: string
+  fullName?: string
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  age?: number
+  currentSchool?: string
+  currentGrade?: string
+  highSchoolGPA?: number
+  languageLevel?: string
+  studyPlan?: string
+  status?: string
+  createdAt?: string
 }
 
 export default function StudentsPage() {
+  const { data: session, status } = useSession()
+  const { toast } = useToast()
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
 
   useEffect(() => {
+    if (status === "loading") return
+    if (!session) {
+      window.location.href = "/admin/login"
+      return
+    }
     fetchStudents()
-  }, [])
+  }, [status, session])
 
   const fetchStudents = async () => {
     try {
-      setLoading(true)
-      const response = await fetch('/api/students')
-      if (response.ok) {
-        const data = await response.json()
+      const response = await fetch("/api/students")
+      const data = await response.json()
+      if (data.success) {
         setStudents(data.students || [])
       } else {
-        setError("Failed to fetch students")
+        console.error("Failed to fetch students:", data.error)
+        setStudents([])
       }
     } catch (error) {
-      setError("Error connecting to database")
+      console.error("Error fetching students:", error)
+      setStudents([])
     } finally {
       setLoading(false)
     }
   }
 
-  const deleteStudent = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this student?")) return
-
+  const updateStudentStatus = async (studentId: string, newStatus: string) => {
     try {
-      const response = await fetch(`/api/students/${id}`, {
-        method: 'DELETE'
+      const response = await fetch(`/api/students/${studentId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
       })
-      if (response.ok) {
-        setStudents(students.filter(student => student._id !== id))
+
+      const data = await response.json()
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: "Student status updated successfully",
+        })
+        fetchStudents() // Refresh the list
       } else {
-        setError("Failed to delete student")
+        toast({
+          title: "Error",
+          description: data.error || "Failed to update student status",
+          variant: "destructive",
+        })
       }
     } catch (error) {
-      setError("Error deleting student")
+      console.error("Error updating student status:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update student status",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const getStudentName = (student: Student) => {
+    if (student.fullName) return student.fullName
+    if (student.firstName && student.lastName) return `${student.firstName} ${student.lastName}`
+    if (student.firstName) return student.firstName
+    if (student.lastName) return student.lastName
+    return "N/A"
+  }
+
+  const getStatusColors = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800"
+      case "contacted":
+        return "bg-blue-100 text-blue-800"
+      case "enrolled":
+        return "bg-purple-100 text-purple-800"
+      case "approved":
+        return "bg-green-100 text-green-800"
+      case "rejected":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
     }
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading students...</p>
+      <div className="container mx-auto py-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Students</h1>
-          <p className="text-gray-600">Manage student registrations</p>
-        </div>
+    <div className="container mx-auto p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Student Registrations</h1>
       </div>
 
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      )}
-
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phone
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Target Country
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {students.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                      No students found
-                    </td>
-                  </tr>
-                ) : (
-                  students.map((student) => (
-                    <tr key={student._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {student.firstName} {student.lastName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {student.nationality}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {student.email}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {student.phone}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {student.targetCountry}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(student.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => deleteStudent(student._id)}
-                          className="text-red-600 hover:text-red-900"
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg sm:text-xl">All Students ({students.length})</CardTitle>
+        </CardHeader>
+        <CardContent className="p-2 sm:p-6">
+          {students.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No students found
+            </div>
+          ) : (
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Name</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden sm:table-cell">Email</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Phone</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden md:table-cell">Age</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden lg:table-cell">School</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden lg:table-cell">Grade</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">GPA</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">Language</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">Plan</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Status</TableHead>
+                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden md:table-cell">Registered</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {students.map((student) => (
+                    <TableRow key={student._id}>
+                      <TableCell className="font-medium text-xs sm:text-sm px-2 sm:px-4">
+                        {getStudentName(student)}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden sm:table-cell">
+                        {student.email || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4">
+                        {student.phone || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden md:table-cell">
+                        {student.age || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden lg:table-cell">
+                        {student.currentSchool || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden lg:table-cell">
+                        {student.currentGrade || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">
+                        {student.highSchoolGPA || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">
+                        {student.languageLevel || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">
+                        {student.studyPlan || "N/A"}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4">
+                        <Select
+                          value={student.status || "pending"}
+                          onValueChange={(value) => updateStudentStatus(student._id, value)}
                         >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+                          <SelectTrigger className="w-20 sm:w-32 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="approved">Approved</SelectItem>
+                            <SelectItem value="rejected">Rejected</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden md:table-cell">
+                        {student.createdAt
+                          ? new Date(student.createdAt).toLocaleDateString()
+                          : "N/A"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 } 

@@ -11,6 +11,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Lock, User } from "lucide-react"
 import { Logo } from "@/components/ui/logo"
 
+// Extend the session user type to include role
+declare module "next-auth" {
+  interface Session {
+    user: {
+      name?: string | null
+      email?: string | null
+      image?: string | null
+      role?: string
+    }
+  }
+}
+
 export default function AdminLoginPage() {
   const router = useRouter()
   const { data: session, status } = useSession()

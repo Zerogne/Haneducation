@@ -11,11 +11,11 @@ export async function GET(req: NextRequest) {
   try {
     await connectToDatabase()
     const students = await Student.find().sort({ createdAt: -1 })
-    return NextResponse.json({ students })
+    return NextResponse.json({ success: true, students })
   } catch (error) {
     console.error("Error fetching students:", error)
     // Fallback to temporary storage
-    return NextResponse.json({ students: tempStudents })
+    return NextResponse.json({ success: true, students: tempStudents })
   }
 }
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     console.log("Processed student data:", processedData)
 
     // Validate required fields
-    const requiredFields = ['firstName', 'lastName', 'age', 'currentSchool', 'currentGrade', 'highSchoolGPA', 'languageLevel', 'studyPlan', 'phone']
+    const requiredFields = ['fullName', 'email', 'age', 'currentSchool', 'currentGrade', 'highSchoolGPA', 'languageLevel', 'studyPlan', 'phone']
     const missingFields = requiredFields.filter(field => !processedData[field])
     
     if (missingFields.length > 0) {
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Validate required fields
-      const requiredFields = ['firstName', 'lastName', 'age', 'currentSchool', 'currentGrade', 'highSchoolGPA', 'languageLevel', 'studyPlan', 'phone']
+      const requiredFields = ['fullName', 'email', 'age', 'currentSchool', 'currentGrade', 'highSchoolGPA', 'languageLevel', 'studyPlan', 'phone']
       const missingFields = requiredFields.filter(field => !processedData[field])
       
       if (missingFields.length > 0) {

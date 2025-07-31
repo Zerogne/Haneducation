@@ -3,10 +3,87 @@
 import { Button } from "@/components/ui/button"
 import { ArrowRight, GraduationCap, Users, Award } from "lucide-react"
 import { motion } from "framer-motion"
-import { useLanguage } from "@/contexts/language-context";
+
+
+import { useState, useEffect } from "react"
+
+interface HeroStats {
+  stats: {
+    students: string
+    universities: string
+    experience: string
+  }
+  statsLabels: {
+    students: string
+    universities: string
+    experience: string
+  }
+}
 
 export function Hero() {
-  const { t } = useLanguage();
+  // Hardcoded content
+  const title = "HAN Education"
+  const subtitle = "Хятадад тэтгэлэгтэй суралцах боломжийг танд олгоно"
+  const description = "Хувийн боловсролын зөвлөх үйлчилгээ | 2022 оноос хойш үйл ажиллагаа явуулж байгаа туршлагатай"
+  const applyNowText = "Өргөдөл гаргах"
+
+  // Stats from database
+  const [stats, setStats] = useState<HeroStats>({
+    stats: {
+      students: "60+",
+      universities: "880+",
+      experience: "4+"
+    },
+    statsLabels: {
+      students: "Амжилттай оюутан",
+      universities: "Хамтрагч их сургууль",
+      experience: "Жилийн туршлага"
+    }
+  })
+  const [loading, setLoading] = useState(true)
+  const [hasInitialized, setHasInitialized] = useState(false)
+
+  useEffect(() => {
+    if (!hasInitialized) {
+      setHasInitialized(true)
+      fetchHeroStats()
+    }
+  }, [hasInitialized])
+
+  const fetchHeroStats = async () => {
+    try {
+      console.log("Fetching hero stats...")
+      const response = await fetch('/api/content?section=hero&language=mn')
+      if (response.ok) {
+        const data = await response.json()
+        console.log("Hero stats response:", data)
+        if (data.content && data.content.length > 0) {
+          try {
+            const parsedContent = JSON.parse(data.content[0].content)
+            console.log("Parsed hero stats:", parsedContent)
+            // Only update stats, not title/description
+            if (parsedContent.stats && parsedContent.statsLabels) {
+              setStats({
+                stats: parsedContent.stats,
+                statsLabels: parsedContent.statsLabels
+              })
+            }
+          } catch (error) {
+            console.error("Error parsing hero stats:", error)
+          }
+        } else {
+          console.log("No hero stats found in database")
+        }
+      } else {
+        console.error("Failed to fetch hero stats:", response.status)
+      }
+    } catch (error) {
+      console.error("Error fetching hero stats:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden w-full">
       {/* Background gradient - full width */}
@@ -28,8 +105,8 @@ export function Hero() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="text-4xl md:text-6xl font-bold leading-tight"
               >
-                HAN Education
-                <span className="block text-primary">{t("HeroSubtitle")}</span>
+                {title}
+                <span className="block text-primary">{subtitle}</span>
               </motion.h1>
 
               <motion.p
@@ -38,7 +115,7 @@ export function Hero() {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="text-lg text-muted-foreground max-w-2xl"
               >
-                {t("HeroDescription")}
+                {description}
               </motion.p>
             </div>
 
@@ -53,7 +130,7 @@ export function Hero() {
                 asChild
               >
                 <a href="/registration" className="relative z-10">
-                  {t("ApplyNow")}
+                  {applyNowText}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" />
                 </a>
               </Button>
@@ -71,8 +148,12 @@ export function Hero() {
                     <Users className="h-6 w-6 text-primary" />
                   </div>
                 </div>
-                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">60+</div>
-                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">{t("SuccessfulStudents")}</div>
+                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">
+                  {loading ? "60+" : stats.stats?.students || "60+"}
+                </div>
+                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">
+                  {loading ? "Амжилттай оюутан" : stats.statsLabels?.students || "Амжилттай оюутан"}
+                </div>
               </div>
               <div className="text-center group cursor-pointer">
                 <div className="flex justify-center mb-2">
@@ -80,8 +161,12 @@ export function Hero() {
                     <GraduationCap className="h-6 w-6 text-primary" />
                   </div>
                 </div>
-                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">880+</div>
-                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">{t("PartnerUniversities")}</div>
+                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">
+                  {loading ? "880+" : stats.stats?.universities || "880+"}
+                </div>
+                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">
+                  {loading ? "Хамтрагч их сургууль" : stats.statsLabels?.universities || "Хамтрагч их сургууль"}
+                </div>
               </div>
               <div className="text-center group cursor-pointer">
                 <div className="flex justify-center mb-2">
@@ -89,8 +174,12 @@ export function Hero() {
                     <Award className="h-6 w-6 text-primary" />
                   </div>
                 </div>
-                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">4+</div>
-                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">{t("YearsExperience")}</div>
+                <div className="text-xl font-bold group-hover:text-primary transition-colors duration-300 ease-out">
+                  {loading ? "4+" : stats.stats?.experience || "4+"}
+                </div>
+                <div className="text-xs text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">
+                  {loading ? "Жилийн туршлага" : stats.statsLabels?.experience || "Жилийн туршлага"}
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -104,7 +193,7 @@ export function Hero() {
             <div className="relative z-10 transition-transform duration-500 ease-out group-hover:-translate-y-2">
               <img
                 src="/placeholder.svg?height=600&width=500&text=Students+in+China"
-                alt={t("HeroImageAlt")}
+                alt="Хятадад суралцаж буй монгол оюутнууд"
                 className="rounded-2xl shadow-2xl transition-shadow duration-500 ease-out group-hover:shadow-3xl"
               />
             </div>

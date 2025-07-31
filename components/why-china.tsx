@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { useLanguage } from "@/contexts/language-context"
+
 import { Award, GraduationCap, Languages, Cpu, Users, MapPin } from "lucide-react"
 
 interface WhyChinaContent {
@@ -93,7 +93,6 @@ const defaultContent: WhyChinaContent = {
 }
 
 export function WhyChina() {
-  const { t } = useLanguage()
   const [content, setContent] = useState<WhyChinaContent>(defaultContent)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -163,13 +162,13 @@ export function WhyChina() {
           className="text-center mb-16"
         >
           <Badge variant="secondary" className="mb-4">
-            {content.metadata?.badge || t("WhyChinaBadge") || "🇨🇳 Хятадад суралцахын шалтгаанууд"}
+            {content.metadata?.badge || "🇨🇳 Хятадад суралцахын шалтгаанууд"}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            {content.title || t("WhyChinaTitle") || "Хятад улсад суралцахын 6 томоохон давуу тал"}
+            {content.title || "Хятад улсад суралцахын 6 томоохон давуу тал"}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {content.description || t("WhyChinaDescription") || "Хятад улсад суралцах нь танд олон давуу тал, боломжуудыг өгдөг."}
+            {content.description || "Хятад улсад суралцах нь танд олон давуу тал, боломжуудыг өгдөг."}
           </p>
         </motion.div>
 

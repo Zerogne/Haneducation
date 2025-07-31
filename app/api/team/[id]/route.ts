@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongoose"
 import { getServerSession } from "next-auth/next"
-import { authOptions as rawAuthOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions as rawAuthOptions } from "@/lib/auth"
 import type { AuthOptions } from "next-auth"
 import Team from "@/models/team"
 

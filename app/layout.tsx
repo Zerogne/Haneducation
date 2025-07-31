@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
 import { ThemeProvider } from "@/components/theme-provider"
-import { LanguageProvider } from "@/contexts/language-context"
+
 import { SessionProviderWrapper } from "@/components/session-provider"
 import { Toaster } from "sonner"
 
@@ -26,14 +26,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionProviderWrapper>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-            <LanguageProvider>
-              <Suspense fallback={null}>
-                {children}
-                <Analytics />
-                <SpeedInsights />
-                <Toaster position="bottom-right" />
-              </Suspense>
-            </LanguageProvider>
+            <Suspense fallback={null}>
+              {children}
+              <Analytics />
+              <SpeedInsights />
+              <Toaster position="bottom-right" />
+            </Suspense>
           </ThemeProvider>
         </SessionProviderWrapper>
       </body>

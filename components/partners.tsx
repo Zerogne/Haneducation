@@ -1,20 +1,58 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { useLanguage } from "@/contexts/language-context";
+
 
 export function Partners() {
-  const { t } = useLanguage();
-  
-  const partners = [
+  const [partners, setPartners] = useState([
     { name: "Tsinghua University", logo: "/placeholder.svg?height=60&width=120&text=TSINGHUA" },
     { name: "Peking University", logo: "/placeholder.svg?height=60&width=120&text=PEKING" },
     { name: "Fudan University", logo: "/placeholder.svg?height=60&width=120&text=FUDAN" },
     { name: "Shanghai Jiao Tong", logo: "/placeholder.svg?height=60&width=120&text=SJTU" },
     { name: "Zhejiang University", logo: "/placeholder.svg?height=60&width=120&text=ZJU" },
     { name: "Nanjing University", logo: "/placeholder.svg?height=60&width=120&text=NJU" },
-  ]
+  ])
+  const [sectionContent, setSectionContent] = useState({
+    title: "Хамтрагч их сургуулиуд",
+    description: "Бидний хамтрагч Хятадын их сургуулиуд",
+    badge: "Хамтрагчид"
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchPartnersContent()
+  }, [])
+
+  const fetchPartnersContent = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/content?section=partners')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.content && data.content.length > 0) {
+          try {
+            const content = JSON.parse(data.content[0].content)
+            setSectionContent({
+              title: content.title || "Хамтрагч их сургуулиуд",
+              description: content.description || "Бидний хамтрагч Хятадын их сургуулиуд",
+              badge: content.badge || "Хамтрагчид"
+            })
+            if (content.partners && Array.isArray(content.partners)) {
+              setPartners(content.partners)
+            }
+          } catch (error) {
+            console.error('Error parsing partners content:', error)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching partners content:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <section id="partners" className="py-20 w-full">
@@ -27,13 +65,13 @@ export function Partners() {
           className="text-center mb-16"
         >
           <Badge variant="secondary" className="mb-4">
-            {t("PartnersBadge")}
+            {sectionContent.badge}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            {t("PartnersTitle")}
+            {sectionContent.title}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {t("PartnersDescription")}
+            {sectionContent.description}
           </p>
         </motion.div>
 

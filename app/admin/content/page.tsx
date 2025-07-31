@@ -1,199 +1,339 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  FileText, 
-  Save,
-  X,
-  Globe,
-  Languages
-} from "lucide-react"
 import { useSession } from "next-auth/react"
-import { redirect } from "next/navigation"
-import { toast } from "sonner"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
+import { Statistics } from "./statistics"
+import { Contact } from "./contact"
+import { Team } from "./team"
+import { Testimonials } from "./testimonials"
 
-interface Content {
+interface TeamMember {
   _id: string
-  section: string
-  title: string
-  subtitle: string
-  content: string
-  description: string
-  language: string
+  name: string
+  role: string
+  email: string
+  phone: string
+  image: string
+  linkedin: string
+  bio: string
   isActive: boolean
   order: number
+  department: string
+  metadata: {
+    experience: string
+    education: string
+    languages: string[]
+    specializations: string[]
+  }
   createdAt: string
   updatedAt: string
 }
 
+interface Testimonial {
+  _id: string
+  name: string
+  university: string
+  content: string
+  rating: number
+  image: string
+  isActive: boolean
+  order: number
+  language: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface ContentState {
+  hero: {
+    title: string
+    subtitle: string
+    description: string
+    applyNowText: string
+    learnMoreText: string
+    stats: {
+      students: string
+      universities: string
+      experience: string
+    }
+    statsLabels: {
+      students: string
+      universities: string
+      experience: string
+    }
+  }
+  contact: {
+    title: string
+    description: string
+    phone: string
+    email: string
+    address: string
+    getAdviceText: string
+  }
+  footer: {
+    title: string
+    description: string
+    copyright: string
+  }
+}
+
 export default function ContentPage() {
   const { data: session, status } = useSession()
-  const [contents, setContents] = useState<Content[]>([])
+  const { toast } = useToast()
   const [loading, setLoading] = useState(true)
-  const [editingContent, setEditingContent] = useState<Content | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [contentToDelete, setContentToDelete] = useState<Content | null>(null)
-  const [selectedLanguage, setSelectedLanguage] = useState("en")
-
-  const [formData, setFormData] = useState({
-    section: "hero",
-    title: "",
-    subtitle: "",
-    content: "",
-    description: "",
-    language: "en",
-    isActive: true,
-    order: 0
+  const [saving, setSaving] = useState(false)
+  const [selectedLanguage, setSelectedLanguage] = useState("mn")
+  const [hasInitialized, setHasInitialized] = useState(false)
+  
+  // Team management state
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+  
+  const [content, setContent] = useState<ContentState>({
+    hero: {
+      title: "",
+      subtitle: "",
+      description: "",
+      applyNowText: "",
+      learnMoreText: "",
+      stats: {
+        students: "",
+        universities: "",
+        experience: ""
+      },
+      statsLabels: {
+        students: "",
+        universities: "",
+        experience: ""
+      }
+    },
+    contact: {
+      title: "",
+      description: "",
+      phone: "",
+      email: "",
+      address: "",
+      getAdviceText: ""
+    },
+    footer: {
+      title: "",
+      description: "",
+      copyright: ""
+    }
   })
 
-  if (status === "loading") {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
-  }
-
-  if (!session) {
-    redirect("/admin/login")
-  }
-
   useEffect(() => {
-    fetchContents()
-  }, [selectedLanguage])
+    if (status === "loading") return
+    if (!session) {
+      window.location.href = "/admin/login"
+      return
+    }
+    // Only fetch once when component mounts and session is available
+    if (status === "authenticated" && !hasInitialized) {
+      setHasInitialized(true)
+      fetchContent()
+      fetchTeamMembers()
+      fetchTestimonials()
+    }
+  }, [status, hasInitialized]) // Only depend on status, not session
 
-  const fetchContents = async () => {
+  const fetchContent = async () => {
     try {
       setLoading(true)
+      
+      
+      // Reset content state to empty before fetching new language content
+      setContent({
+        hero: {
+          title: "",
+          subtitle: "",
+          description: "",
+          applyNowText: "",
+          learnMoreText: "",
+          stats: {
+            students: "",
+            universities: "",
+            experience: ""
+          },
+          statsLabels: {
+            students: "",
+            universities: "",
+            experience: ""
+          }
+        },
+        contact: {
+          title: "",
+          description: "",
+          phone: "",
+          email: "",
+          address: "",
+          getAdviceText: ""
+        },
+        footer: {
+          title: "",
+          description: "",
+          copyright: ""
+        }
+      })
+
       const response = await fetch(`/api/content?language=${selectedLanguage}`)
-      const data = await response.json()
-      setContents(data.contents || [])
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Fetched content:', data)
+        
+        if (data.content && data.content.length > 0) {
+          const parsedContent = data.content.reduce((acc: any, item: any) => {
+            try {
+              const parsed = JSON.parse(item.content)
+              acc[item.section] = parsed
+            } catch (error) {
+              console.error(`Error parsing content for section ${item.section}:`, error)
+            }
+            return acc
+          }, {})
+
+          setContent(prev => ({
+            ...prev,
+            ...parsedContent
+          }))
+        }
+      } else {
+        console.error('Failed to fetch content:', response.status)
+      }
     } catch (error) {
-      console.error("Error fetching content:", error)
-      toast.error("Failed to fetch content")
+      console.error('Error fetching content:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+  const saveContent = async (section: string, sectionData: any) => {
     try {
-      const url = editingContent ? `/api/content/${editingContent._id}` : "/api/content"
-      const method = editingContent ? "PUT" : "POST"
+      setSaving(true)
+      console.log(`Saving ${section} content:`, sectionData)
       
-      const response = await fetch(url, {
-        method,
+      const response = await fetch('/api/content', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          section,
+          content: JSON.stringify(sectionData),
+          language: selectedLanguage
+        }),
       })
 
       if (response.ok) {
-        toast.success(editingContent ? "Content updated successfully" : "Content created successfully")
-        setIsDialogOpen(false)
-        resetForm()
-        fetchContents()
+        toast({
+          title: "Success",
+          description: `${section} content saved successfully`,
+        })
+        await fetchContent()
       } else {
         const error = await response.json()
-        toast.error(error.error || "Failed to save content")
+        toast({
+          title: "Error",
+          description: error.error || "Failed to save content",
+          variant: "destructive",
+        })
       }
     } catch (error) {
       console.error("Error saving content:", error)
-      toast.error("Failed to save content")
+      toast({
+        title: "Error",
+        description: "Failed to save content",
+        variant: "destructive",
+      })
+    } finally {
+      setSaving(false)
     }
   }
 
-  const handleEdit = (content: Content) => {
-    setEditingContent(content)
-    setFormData({
-      section: content.section,
-      title: content.title,
-      subtitle: content.subtitle,
-      content: content.content,
-      description: content.description,
-      language: content.language,
-      isActive: content.isActive,
-      order: content.order
-    })
-    setIsDialogOpen(true)
+  const updateContent = (section: keyof ContentState, field: string, value: string) => {
+    setContent(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
+    }))
   }
 
-  const handleDelete = async () => {
-    if (!contentToDelete) return
+  const updateStats = (section: string, stat: string, value: string) => {
+    if (section === 'hero') {
+      setContent(prev => ({
+        ...prev,
+        hero: {
+          ...prev.hero,
+          stats: {
+            ...prev.hero.stats,
+            [stat]: value
+          }
+        }
+      }))
+    }
+  }
 
+  const updateStatsLabels = (section: string, stat: string, value: string) => {
+    if (section === 'hero') {
+      setContent(prev => ({
+        ...prev,
+        hero: {
+          ...prev.hero,
+          statsLabels: {
+            ...prev.hero.statsLabels,
+            [stat]: value
+          }
+        }
+      }))
+    }
+  }
+
+  const fetchTeamMembers = async () => {
     try {
-      const response = await fetch(`/api/content/${contentToDelete._id}`, {
-        method: "DELETE",
-      })
-
-      if (response.ok) {
-        toast.success("Content deleted successfully")
-        setIsDeleteDialogOpen(false)
-        setContentToDelete(null)
-        fetchContents()
+      console.log('Fetching team members...')
+      const response = await fetch('/api/team')
+      const data = await response.json()
+      if (data.success) {
+        setTeamMembers(data.team || [])
       } else {
-        const error = await response.json()
-        toast.error(error.error || "Failed to delete content")
+        console.error("Failed to fetch team members:", data.error)
+        setTeamMembers([])
       }
     } catch (error) {
-      console.error("Error deleting content:", error)
-      toast.error("Failed to delete content")
+      console.error("Error fetching team members:", error)
+      setTeamMembers([])
     }
   }
 
-  const resetForm = () => {
-    setEditingContent(null)
-    setFormData({
-      section: "hero",
-      title: "",
-      subtitle: "",
-      content: "",
-      description: "",
-      language: "en",
-      isActive: true,
-      order: 0
-    })
+  const fetchTestimonials = async () => {
+    try {
+      console.log('Fetching testimonials...')
+      const response = await fetch('/api/testimonials?language=mn&admin=true')
+      const data = await response.json()
+      setTestimonials(data.testimonials || [])
+    } catch (error) {
+      console.error("Error fetching testimonials:", error)
+    }
   }
 
-  const sectionOptions = [
-    { value: "hero", label: "Hero Section" },
-    { value: "about", label: "About Section" },
-    { value: "services", label: "Services Section" },
-    { value: "testimonials", label: "Testimonials Section" },
-    { value: "team", label: "Team Section" },
-    { value: "partners", label: "Partners Section" },
-    { value: "contact", label: "Contact Section" },
-    { value: "footer", label: "Footer" },
-  ]
-
-  const getSectionIcon = (section: string) => {
-    switch (section) {
-      case "hero": return "🏠"
-      case "about": return "ℹ️"
-      case "services": return "🎓"
-      case "testimonials": return "💬"
-      case "team": return "👥"
-      case "partners": return "🤝"
-      case "contact": return "📞"
-      case "footer": return "📄"
-      default: return "📝"
-    }
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p>Loading content...</p>
@@ -203,246 +343,57 @@ export default function ContentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Content Management</h1>
-            <p className="text-gray-600 mt-2">Manage all website text content and sections</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="mn">Mongolian</SelectItem>
-              </SelectContent>
-            </Select>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={resetForm}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Content
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingContent ? "Edit Content" : "Add New Content"}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {editingContent ? "Update the content information below." : "Fill in the content information below."}
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="section">Section</Label>
-                      <Select value={formData.section} onValueChange={(value) => setFormData(prev => ({ ...prev, section: value }))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {sectionOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="order">Order</Label>
-                      <Input
-                        id="order"
-                        type="number"
-                        value={formData.order}
-                        onChange={(e) => setFormData(prev => ({ ...prev, order: parseInt(e.target.value) }))}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="title">Title</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="subtitle">Subtitle</Label>
-                    <Input
-                      id="subtitle"
-                      value={formData.subtitle}
-                      onChange={(e) => setFormData(prev => ({ ...prev, subtitle: e.target.value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="content">Content</Label>
-                    <Textarea
-                      id="content"
-                      value={formData.content}
-                      onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                      rows={4}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="isActive"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                    />
-                    <Label htmlFor="isActive">Active</Label>
-                  </div>
-
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit">
-                      <Save className="h-4 w-4 mr-2" />
-                      {editingContent ? "Update" : "Create"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
+    <div className="container mx-auto p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Content Management</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">Edit website content in Mongolian</p>
         </div>
-
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {contents.map((content) => (
-            <Card key={content._id} className="relative group">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">{getSectionIcon(content.section)}</span>
-                    <div>
-                      <CardTitle className="text-lg">{content.title}</CardTitle>
-                      <CardDescription className="text-sm">
-                        {content.section} • {content.language.toUpperCase()}
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant={content.isActive ? "default" : "secondary"}>
-                      {content.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                    <Badge variant="outline">
-                      #{content.order}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {content.subtitle && (
-                  <p className="text-sm font-medium text-gray-700 mb-2">
-                    {content.subtitle}
-                  </p>
-                )}
-                
-                <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                  {content.content}
-                </p>
-
-                {content.description && (
-                  <p className="text-xs text-gray-500 mb-4 line-clamp-2">
-                    {content.description}
-                  </p>
-                )}
-
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span>Updated: {new Date(content.updatedAt).toLocaleDateString()}</span>
-                  <span>Language: {content.language.toUpperCase()}</span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEdit(content)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setContentToDelete(content)
-                        setIsDeleteDialogOpen(true)
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {contents.length === 0 && (
-          <Card className="mt-8">
-            <CardContent className="text-center py-12">
-              <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No content found</h3>
-              <p className="text-gray-500 mb-4">
-                No content found for {selectedLanguage.toUpperCase()} language.
-              </p>
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add First Content
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete Content</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete "{contentToDelete?.title}"? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={handleDelete}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
+
+      <Tabs defaultValue="statistics" className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2">
+          <TabsTrigger value="statistics" className="text-xs sm:text-sm">Statistics</TabsTrigger>
+          <TabsTrigger value="contact" className="text-xs sm:text-sm">Contact Info</TabsTrigger>
+          <TabsTrigger value="team" className="text-xs sm:text-sm">Team Members</TabsTrigger>
+          <TabsTrigger value="testimonials" className="text-xs sm:text-sm">Testimonials</TabsTrigger>
+        </TabsList>
+
+        
+
+        <TabsContent value="statistics">
+          <Statistics
+            content={content}
+            updateStats={updateStats}
+            updateStatsLabels={updateStatsLabels}
+            saveContent={saveContent}
+            saving={saving}
+          />
+        </TabsContent>
+
+        <TabsContent value="contact">
+          <Contact
+            content={content}
+            updateContent={updateContent}
+            saveContent={saveContent}
+            saving={saving}
+          />
+        </TabsContent>
+
+        <TabsContent value="team">
+          <Team
+            teamMembers={teamMembers}
+            fetchTeamMembers={fetchTeamMembers}
+          />
+        </TabsContent>
+
+        <TabsContent value="testimonials">
+          <Testimonials
+            testimonials={testimonials}
+            fetchTestimonials={fetchTestimonials}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 } 

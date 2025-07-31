@@ -80,6 +80,13 @@ export default function StoragePage() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
+  const formatStorage = (gb: number) => {
+    if (gb < 1) {
+      return `${Math.round(gb * 1024)} MB`
+    }
+    return `${gb.toFixed(3)} GB`
+  }
+
   const getStatusColor = (percentage: number) => {
     if (percentage < 70) return "text-green-600"
     if (percentage < 90) return "text-yellow-600"
@@ -140,7 +147,7 @@ export default function StoragePage() {
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Storage Used</span>
                 <span className={`text-sm font-bold ${getStatusColor(storageData?.mongodb.percentage || 0)}`}>
-                  {storageData ? formatBytes(storageData.mongodb.used * 1024 * 1024 * 1024) : '0 GB'}
+                  {storageData ? formatStorage(storageData.mongodb.used) : '0 MB'}
                 </span>
               </div>
               
@@ -155,12 +162,12 @@ export default function StoragePage() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Total Space:</span>
-                  <p className="font-medium">{storageData ? formatBytes(storageData.mongodb.total * 1024 * 1024 * 1024) : '0 GB'}</p>
+                  <p className="font-medium">{storageData ? formatStorage(storageData.mongodb.total) : '512 MB'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Available:</span>
                   <p className="font-medium">
-                    {storageData ? formatBytes((storageData.mongodb.total - storageData.mongodb.used) * 1024 * 1024 * 1024) : '0 GB'}
+                    {storageData ? formatStorage(storageData.mongodb.total - storageData.mongodb.used) : '512 MB'}
                   </p>
                 </div>
               </div>

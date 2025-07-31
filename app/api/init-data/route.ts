@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongoose"
 import Team from "@/models/team"
+import Service from "@/models/service"
+import Partner from "@/models/partner"
 import Content from "@/models/content"
 import User from "@/models/user"
 import bcrypt from "bcryptjs"
@@ -80,6 +82,166 @@ export async function POST() {
       console.log("Team members initialized successfully")
     }
 
+    // Initialize services
+    const existingServices = await Service.find({})
+    if (existingServices.length === 0) {
+      const services = [
+        {
+          title: "University Placement",
+          description: "Placement for bachelor, master, and PhD programs",
+          icon: "GraduationCap",
+          features: ["Bachelor", "Master", "PhD", "Professional Training"],
+          color: "blue",
+          hoverColor: "blue",
+          isActive: true,
+          order: 1,
+          language: "en"
+        },
+        {
+          title: "Language Program",
+          description: "Registration and consulting for Chinese language programs",
+          icon: "Languages",
+          features: ["HSKPrep", "LanguageTraining", "OnlineClass", "DocumentTranslation"],
+          color: "green",
+          hoverColor: "green",
+          isActive: true,
+          order: 2,
+          language: "en"
+        },
+        {
+          title: "Visa Documentation",
+          description: "Preparation of all documents required for student visa",
+          icon: "FileText",
+          features: ["VisaApplication", "DocumentTranslation", "Notarization", "Consulting"],
+          color: "purple",
+          hoverColor: "purple",
+          isActive: true,
+          order: 3,
+          language: "en"
+        },
+        {
+          title: "Scholarship Placement",
+          description: "Assistance in obtaining government and private scholarships",
+          icon: "Award",
+          features: ["GovScholarship", "UniScholarship"],
+          color: "orange",
+          hoverColor: "orange",
+          isActive: true,
+          order: 4,
+          language: "en"
+        },
+        {
+          title: "Consulting Service",
+          description: "Consulting for educational and career choices",
+          icon: "Users",
+          features: ["CareerConsulting", "UniConsulting"],
+          color: "red",
+          hoverColor: "red",
+          isActive: true,
+          order: 5,
+          language: "en"
+        },
+        {
+          title: "Support Service",
+          description: "Continuous support during your studies in China",
+          icon: "BookOpen",
+          features: ["AcademicSupport", "LifeAdvice"],
+          color: "teal",
+          hoverColor: "teal",
+          isActive: true,
+          order: 6,
+          language: "en"
+        }
+      ]
+
+      for (const service of services) {
+        const newService = new Service(service)
+        await newService.save()
+      }
+
+      console.log("Services initialized successfully")
+    }
+
+    // Initialize partners
+    const existingPartners = await Partner.find({})
+    if (existingPartners.length === 0) {
+      const partners = [
+        {
+          name: "Tsinghua University",
+          logo: "/placeholder.svg?height=60&width=120&text=TSINGHUA",
+          website: "https://www.tsinghua.edu.cn",
+          description: "One of China's most prestigious universities",
+          isActive: true,
+          order: 1,
+          type: "university",
+          location: "Beijing, China",
+          partnershipLevel: "premium"
+        },
+        {
+          name: "Peking University",
+          logo: "/placeholder.svg?height=60&width=120&text=PEKING",
+          website: "https://www.pku.edu.cn",
+          description: "China's first national comprehensive university",
+          isActive: true,
+          order: 2,
+          type: "university",
+          location: "Beijing, China",
+          partnershipLevel: "premium"
+        },
+        {
+          name: "Fudan University",
+          logo: "/placeholder.svg?height=60&width=120&text=FUDAN",
+          website: "https://www.fudan.edu.cn",
+          description: "Leading research university in Shanghai",
+          isActive: true,
+          order: 3,
+          type: "university",
+          location: "Shanghai, China",
+          partnershipLevel: "standard"
+        },
+        {
+          name: "Shanghai Jiao Tong University",
+          logo: "/placeholder.svg?height=60&width=120&text=SJTU",
+          website: "https://www.sjtu.edu.cn",
+          description: "Top engineering university in China",
+          isActive: true,
+          order: 4,
+          type: "university",
+          location: "Shanghai, China",
+          partnershipLevel: "standard"
+        },
+        {
+          name: "Zhejiang University",
+          logo: "/placeholder.svg?height=60&width=120&text=ZJU",
+          website: "https://www.zju.edu.cn",
+          description: "Comprehensive research university",
+          isActive: true,
+          order: 5,
+          type: "university",
+          location: "Hangzhou, China",
+          partnershipLevel: "standard"
+        },
+        {
+          name: "Nanjing University",
+          logo: "/placeholder.svg?height=60&width=120&text=NJU",
+          website: "https://www.nju.edu.cn",
+          description: "Ancient and prestigious university",
+          isActive: true,
+          order: 6,
+          type: "university",
+          location: "Nanjing, China",
+          partnershipLevel: "standard"
+        }
+      ]
+
+      for (const partner of partners) {
+        const newPartner = new Partner(partner)
+        await newPartner.save()
+      }
+
+      console.log("Partners initialized successfully")
+    }
+
     // Initialize content with optimized structure
     const existingContent = await Content.find({ section: "why-china" })
     if (existingContent.length === 0) {
@@ -123,7 +285,7 @@ export async function POST() {
         order: 1,
         isActive: true,
         metadata: {
-          badge: "🇨🇳 Хятадад суралцахын шалтгаанууд"
+          badge: "��🇳 Хятадад суралцахын шалтгаанууд"
         }
       }
 
@@ -135,6 +297,8 @@ export async function POST() {
 
     // Get storage statistics
     const teamCount = await Team.countDocuments()
+    const servicesCount = await Service.countDocuments()
+    const partnersCount = await Partner.countDocuments()
     const contentCount = await Content.countDocuments()
     const userCount = await User.countDocuments()
 
@@ -143,6 +307,8 @@ export async function POST() {
       message: "Data initialized successfully with storage optimization",
       stats: {
         teamMembers: teamCount,
+        services: servicesCount,
+        partners: partnersCount,
         contentSections: contentCount,
         users: userCount
       },

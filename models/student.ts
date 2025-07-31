@@ -2,8 +2,8 @@ import mongoose, { Schema } from "mongoose"
 
 // Define the Student schema
 const studentSchema = new Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  fullName: { type: String, required: true },
+  email: { type: String, required: true },
   age: { type: Number, required: true },
   currentSchool: { type: String, required: true },
   currentGrade: { type: String, required: true },
@@ -11,7 +11,7 @@ const studentSchema = new Schema({
   languageLevel: { type: String, required: true },
   studyPlan: { type: String, required: true },
   phone: { type: String, required: true },
-  status: { type: String, default: "pending", enum: ["pending", "contacted", "enrolled", "rejected"] },
+  status: { type: String, default: "pending", enum: ["pending", "contacted", "enrolled", "approved", "rejected"] },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 })

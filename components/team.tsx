@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Mail, Phone, Linkedin } from "lucide-react"
 import { motion } from "framer-motion"
-import { useLanguage } from "@/contexts/language-context";
+
 
 interface TeamMember {
   _id: string
@@ -74,14 +74,46 @@ const defaultTeamMembers: TeamMember[] = [
 ]
 
 export function Team() {
-  const { t } = useLanguage();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(defaultTeamMembers)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [hasInitialized, setHasInitialized] = useState(false)
+  const [sectionContent, setSectionContent] = useState({
+    title: "Бидний баг",
+    description: "Бидний туршлагатай, мэргэжлийн баг",
+    badge: "Багийн гишүүд"
+  })
 
   useEffect(() => {
-    fetchTeamMembers()
-  }, [])
+    if (!hasInitialized) {
+      setHasInitialized(true)
+      fetchTeamMembers()
+      fetchSectionContent()
+    }
+  }, [hasInitialized])
+
+  const fetchSectionContent = async () => {
+    try {
+      const response = await fetch('/api/content?section=team')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.content && data.content.length > 0) {
+          try {
+            const content = JSON.parse(data.content[0].content)
+            setSectionContent({
+              title: content.title || "Бидний баг",
+              description: content.description || "Бидний туршлагатай, мэргэжлийн баг",
+              badge: content.badge || "Багийн гишүүд"
+            })
+          } catch (error) {
+            console.error('Error parsing team section content:', error)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching team section content:', error)
+    }
+  }
 
   const fetchTeamMembers = async () => {
     try {
@@ -136,17 +168,17 @@ export function Team() {
           className="text-center mb-16"
         >
           <Badge variant="secondary" className="mb-4">
-            {t("TeamBadge")}
+            {sectionContent.badge}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            {t("TeamTitle")}
+            {sectionContent.title}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {t("TeamDescription")}
+            {sectionContent.description}
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           {teamMembers.map((member, index) => (
             <motion.div
               key={member._id}
@@ -154,6 +186,7 @@ export function Team() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: index * 0.2 }}
               viewport={{ once: true }}
+              className="w-full md:w-80 lg:w-80"
             >
               <Card className="h-full group cursor-pointer hover:shadow-lg transition-all duration-300 ease-out hover:-translate-y-1 border hover:border-primary/20 bg-background">
                 <CardContent className="p-6 text-center">
