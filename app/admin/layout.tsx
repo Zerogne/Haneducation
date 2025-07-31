@@ -182,17 +182,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </svg>
                 <span className={`${isSidebarOpen ? 'block' : 'hidden'}`}>Content</span>
               </a>
-              <a
-                href="/admin/images"
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-                  pathname === "/admin/images" && isSidebarOpen ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                } ${!isSidebarOpen ? 'justify-center' : ''}`}
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className={`${isSidebarOpen ? 'block' : 'hidden'}`}>Images</span>
-              </a>
+              
               <a
                 href="/admin/settings"
                 className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
