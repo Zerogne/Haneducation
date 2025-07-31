@@ -138,65 +138,28 @@ export default function StudentsPage() {
         <CardHeader>
           <CardTitle className="text-lg sm:text-xl">All Students ({students.length})</CardTitle>
         </CardHeader>
-        <CardContent className="p-2 sm:p-6">
+        <CardContent className="p-4 sm:p-6">
           {students.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               No students found
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-2 sm:mx-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Name</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden sm:table-cell">Email</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Phone</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden md:table-cell">Age</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden lg:table-cell">School</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden lg:table-cell">Grade</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">GPA</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">Language</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">Plan</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Status</TableHead>
-                    <TableHead className="text-xs sm:text-sm px-2 sm:px-4 hidden md:table-cell">Registered</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {students.map((student) => (
-                    <TableRow key={student._id}>
-                      <TableCell className="font-medium text-xs sm:text-sm px-2 sm:px-4">
-                        {getStudentName(student)}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden sm:table-cell">
-                        {student.email || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4">
-                        {student.phone || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden md:table-cell">
-                        {student.age || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden lg:table-cell">
-                        {student.currentSchool || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden lg:table-cell">
-                        {student.currentGrade || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">
-                        {student.highSchoolGPA || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">
-                        {student.languageLevel || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden xl:table-cell">
-                        {student.studyPlan || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4">
+            <>
+              {/* Mobile Card View */}
+              <div className="block lg:hidden space-y-4">
+                {students.map((student) => (
+                  <Card key={student._id} className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg">{getStudentName(student)}</h3>
+                          <p className="text-sm text-gray-600">{student.email || "N/A"}</p>
+                        </div>
                         <Select
                           value={student.status || "pending"}
                           onValueChange={(value) => updateStudentStatus(student._id, value)}
                         >
-                          <SelectTrigger className="w-20 sm:w-32 text-xs">
+                          <SelectTrigger className="w-24 h-8 text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -205,17 +168,121 @@ export default function StudentsPage() {
                             <SelectItem value="rejected">Rejected</SelectItem>
                           </SelectContent>
                         </Select>
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm px-2 sm:px-4 hidden md:table-cell">
-                        {student.createdAt
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="font-medium">Phone:</span> {student.phone || "N/A"}
+                        </div>
+                        <div>
+                          <span className="font-medium">Age:</span> {student.age || "N/A"}
+                        </div>
+                        <div>
+                          <span className="font-medium">School:</span> {student.currentSchool || "N/A"}
+                        </div>
+                        <div>
+                          <span className="font-medium">Grade:</span> {student.currentGrade || "N/A"}
+                        </div>
+                        <div>
+                          <span className="font-medium">GPA:</span> {student.highSchoolGPA || "N/A"}
+                        </div>
+                        <div>
+                          <span className="font-medium">Language:</span> {student.languageLevel || "N/A"}
+                        </div>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <span className="font-medium">Study Plan:</span> {student.studyPlan || "N/A"}
+                      </div>
+                      
+                      <div className="text-xs text-gray-500">
+                        Registered: {student.createdAt
                           ? new Date(student.createdAt).toLocaleDateString()
                           : "N/A"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block">
+                <div className="rounded-lg border">
+                  <div className="overflow-x-auto">
+                    <Table className="min-w-full">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50 sticky left-0 z-10">Name</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">Email</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">Phone</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">Age</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">School</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">Grade</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">GPA</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">Language</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">Plan</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">Status</TableHead>
+                          <TableHead className="text-sm px-4 py-3 whitespace-nowrap bg-gray-50">Registered</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {students.map((student) => (
+                          <TableRow key={student._id} className="hover:bg-gray-50">
+                            <TableCell className="font-medium text-sm px-4 py-3 whitespace-nowrap sticky left-0 z-10 bg-white">
+                              {getStudentName(student)}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.email || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.phone || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.age || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.currentSchool || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.currentGrade || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.highSchoolGPA || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.languageLevel || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.studyPlan || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              <Select
+                                value={student.status || "pending"}
+                                onValueChange={(value) => updateStudentStatus(student._id, value)}
+                              >
+                                <SelectTrigger className="w-24 h-9 text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="approved">Approved</SelectItem>
+                                  <SelectItem value="rejected">Rejected</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell className="text-sm px-4 py-3 whitespace-nowrap">
+                              {student.createdAt
+                                ? new Date(student.createdAt).toLocaleDateString()
+                                : "N/A"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

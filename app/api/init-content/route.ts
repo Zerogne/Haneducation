@@ -214,8 +214,7 @@ export async function POST() {
       success: true, 
       message: "All hardcoded content has been saved to database",
       count: savedContent.length,
-      sections: ["hero", "about", "contact", "footer"],
-      languages: ["en", "mn"]
+      sections: ["hero", "about", "contact", "footer"]
     })
     
   } catch (error) {

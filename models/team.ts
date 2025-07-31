@@ -18,7 +18,6 @@ const teamSchema = new Schema({
   metadata: {
     experience: { type: String, default: "" },
     education: { type: String, default: "" },
-    languages: [{ type: String }],
     specializations: [{ type: String }]
   },
   createdAt: { type: Date, default: Date.now },

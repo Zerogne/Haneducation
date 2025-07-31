@@ -87,3 +87,17 @@ html {
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out;
 }
+
+/* Continuous scroll animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 60s linear infinite;
+}

@@ -351,48 +351,48 @@ export default function ContentPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="statistics" className="space-y-4 sm:space-y-6">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2">
-          <TabsTrigger value="statistics" className="text-xs sm:text-sm">Statistics</TabsTrigger>
-          <TabsTrigger value="contact" className="text-xs sm:text-sm">Contact Info</TabsTrigger>
-          <TabsTrigger value="team" className="text-xs sm:text-sm">Team Members</TabsTrigger>
-          <TabsTrigger value="testimonials" className="text-xs sm:text-sm">Testimonials</TabsTrigger>
+      <Tabs defaultValue="statistics" className="space-y-8 sm:space-y-12">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2 h-auto">
+          <TabsTrigger value="statistics" className="text-xs sm:text-sm py-3">Statistics</TabsTrigger>
+          <TabsTrigger value="contact" className="text-xs sm:text-sm py-3">Contact Info</TabsTrigger>
+          <TabsTrigger value="team" className="text-xs sm:text-sm py-3">Team Members</TabsTrigger>
+          <TabsTrigger value="testimonials" className="text-xs sm:text-sm py-3">Testimonials</TabsTrigger>
         </TabsList>
 
-        
+        <div className="mt-12 sm:mt-16">
+          <TabsContent value="statistics" className="mt-0">
+            <Statistics
+              content={content}
+              updateStats={updateStats}
+              updateStatsLabels={updateStatsLabels}
+              saveContent={saveContent}
+              saving={saving}
+            />
+          </TabsContent>
 
-        <TabsContent value="statistics">
-          <Statistics
-            content={content}
-            updateStats={updateStats}
-            updateStatsLabels={updateStatsLabels}
-            saveContent={saveContent}
-            saving={saving}
-          />
-        </TabsContent>
+          <TabsContent value="contact" className="mt-0">
+            <Contact
+              content={content}
+              updateContent={updateContent}
+              saveContent={saveContent}
+              saving={saving}
+            />
+          </TabsContent>
 
-        <TabsContent value="contact">
-          <Contact
-            content={content}
-            updateContent={updateContent}
-            saveContent={saveContent}
-            saving={saving}
-          />
-        </TabsContent>
+          <TabsContent value="team" className="mt-0">
+            <Team
+              teamMembers={teamMembers}
+              fetchTeamMembers={fetchTeamMembers}
+            />
+          </TabsContent>
 
-        <TabsContent value="team">
-          <Team
-            teamMembers={teamMembers}
-            fetchTeamMembers={fetchTeamMembers}
-          />
-        </TabsContent>
-
-        <TabsContent value="testimonials">
-          <Testimonials
-            testimonials={testimonials}
-            fetchTestimonials={fetchTestimonials}
-          />
-        </TabsContent>
+          <TabsContent value="testimonials" className="mt-0">
+            <Testimonials
+              testimonials={testimonials}
+              fetchTestimonials={fetchTestimonials}
+            />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   )

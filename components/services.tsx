@@ -11,7 +11,6 @@ import { motion } from "framer-motion"
 interface Service {
   _id: string
   title: string
-  description: string
   icon: string
   features: string[]
   color: string
@@ -297,9 +296,6 @@ export function Services() {
                     <CardTitle className="text-xl mb-4 group-hover:text-primary transition-colors duration-300 ease-out">
                       {service.title}
                     </CardTitle>
-                    <CardDescription className="group-hover:text-foreground transition-colors duration-300 ease-out leading-relaxed">
-                      {service.description}
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-3">

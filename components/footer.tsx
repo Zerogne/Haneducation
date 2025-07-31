@@ -149,11 +149,7 @@ export function Footer() {
                   Хамтрагч их сургууль
                 </Link>
               </li>
-              <li>
-                <Link href="#" className="hover:text-primary">
-                  Карьер
-                </Link>
-              </li>
+              
               <li>
                 <Link href="#" className="hover:text-primary">
                   Холбоо барих
@@ -178,7 +174,7 @@ export function Footer() {
         </div>
 
         <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} HAN Education. {loading ? "All rights reserved." : content.copyright || "All rights reserved."}</p>
+          <p>2025 HAN Education | All rights reserved. </p>
         </div>
       </div>
     </footer>

@@ -269,8 +269,7 @@ export async function POST() {
       success: true, 
       message: "All content sections have been initialized in the database",
       count: savedContent.length,
-      sections: ["hero", "about", "services", "team", "partners", "contact", "footer"],
-      languages: ["en", "mn"]
+      sections: ["hero", "about", "services", "team", "partners", "contact", "footer"]
     })
     
   } catch (error) {

@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
       metadata: {
         experience: body.experience || "",
         education: body.education || "",
-        languages: body.languages || [],
         specializations: body.specializations || []
       }
     })

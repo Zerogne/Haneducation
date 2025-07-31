@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 
 export function Partners() {
+  const router = useRouter()
   const [partners, setPartners] = useState([
-    { name: "Tsinghua University", logo: "/placeholder.svg?height=60&width=120&text=TSINGHUA" },
-    { name: "Peking University", logo: "/placeholder.svg?height=60&width=120&text=PEKING" },
-    { name: "Fudan University", logo: "/placeholder.svg?height=60&width=120&text=FUDAN" },
-    { name: "Shanghai Jiao Tong", logo: "/placeholder.svg?height=60&width=120&text=SJTU" },
-    { name: "Zhejiang University", logo: "/placeholder.svg?height=60&width=120&text=ZJU" },
-    { name: "Nanjing University", logo: "/placeholder.svg?height=60&width=120&text=NJU" },
+    { name: "Tsinghua University", logo: "https://res.cloudinary.com/dewhswho9/image/upload/v1753511863/E8_BE_BD_E5_AE_81_E7_9F_B3_E6_B2_B9_E5_8C_96_E5_B7_A5_20_3_kx8pgg.jpg" },
+    { name: "Peking University", logo: "https://res.cloudinary.com/dewhswho9/image/upload/v1753511854/E7_BB_84_E4_BB_B6_2050_20_E2_80_93_201_compressed_xcslgp.jpg" },
+    { name: "Fudan University", logo: "https://res.cloudinary.com/dewhswho9/image/upload/v1753511843/E7_BB_84_E4_BB_B6_208_20_E2_80_93_201_compressed_tfdo6s.jpg" },
+    { name: "Shanghai Jiao Tong", logo: "https://res.cloudinary.com/dewhswho9/image/upload/v1753511810/E7_BB_84_E4_BB_B6_207_20_E2_80_93_201_compressed_x6hmfj.jpg" },
+    { name: "Zhejiang University", logo: "https://res.cloudinary.com/dewhswho9/image/upload/v1753511805/E6_B2_A7_E5_B7_9E_E8_81_8C_E4_B8_9A_20_7_gzvzde.jpg" },
+    { name: "Nanjing University", logo: "https://res.cloudinary.com/dewhswho9/image/upload/v1753511798/E6_B1_9F_E8_A5_BF_E8_B4_A2_E7_BB_8F_E5_A4_A7_E5_AD_A6_gb4hot.jpg" },
   ])
   const [sectionContent, setSectionContent] = useState({
     title: "Хамтрагч их сургуулиуд",
@@ -21,38 +24,8 @@ export function Partners() {
   })
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchPartnersContent()
-  }, [])
-
-  const fetchPartnersContent = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch('/api/content?section=partners')
-      if (response.ok) {
-        const data = await response.json()
-        if (data.content && data.content.length > 0) {
-          try {
-            const content = JSON.parse(data.content[0].content)
-            setSectionContent({
-              title: content.title || "Хамтрагч их сургуулиуд",
-              description: content.description || "Бидний хамтрагч Хятадын их сургуулиуд",
-              badge: content.badge || "Хамтрагчид"
-            })
-            if (content.partners && Array.isArray(content.partners)) {
-              setPartners(content.partners)
-            }
-          } catch (error) {
-            console.error('Error parsing partners content:', error)
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching partners content:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  
+  
 
   return (
     <section id="partners" className="py-20 w-full">
@@ -75,7 +48,7 @@ export function Partners() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
           {partners.map((partner, index) => (
             <motion.div
               key={index}
@@ -89,12 +62,29 @@ export function Partners() {
                 <img
                   src={partner.logo}
                   alt={partner.name}
-                  className="h-12 w-auto grayscale group-hover:grayscale-0 transition-all duration-300 ease-out group-hover:scale-105"
+                  className="h-12 w-auto transition-all duration-300 ease-out group-hover:scale-105"
                 />
               </div>
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center"
+        >
+          <Button 
+            onClick={() => router.push('/partners')}
+            variant="outline"
+            size="lg"
+            className="px-8 py-3 text-lg font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+          >
+            Дэлгэрэнгүй
+          </Button>
+        </motion.div>
       </div>
     </section>
   )
