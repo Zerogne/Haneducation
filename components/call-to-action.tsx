@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Phone, Mail, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
+import { ContactForm } from "@/components/contact-form"
 
 interface ContactContent {
   title: string

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { ArrowRight, GraduationCap, Users, Award } from "lucide-react"
 import { motion } from "framer-motion"
-
+import { Logo } from "@/components/ui/logo"
 
 import { useState, useEffect } from "react"
 
@@ -98,6 +98,8 @@ export function Hero() {
             transition={{ duration: 0.8 }}
             className="space-y-8"
           >
+
+
             <div className="space-y-4">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
@@ -188,17 +190,11 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative hidden lg:block group"
+            className="relative hidden lg:block group h-full min-h-[500px]"
           >
-            <div className="relative z-10 transition-transform duration-500 ease-out group-hover:-translate-y-2">
-              <img
-                src="/placeholder.svg?height=600&width=500&text=Students+in+China"
-                alt="Хятадад суралцаж буй монгол оюутнууд"
-                className="rounded-2xl shadow-2xl transition-shadow duration-500 ease-out group-hover:shadow-3xl"
-              />
+            <div className="relative z-10 transition-transform duration-500 ease-out group-hover:-translate-y-2 flex items-center justify-center w-full h-full">
+              <Logo width={400} height={400} className="max-w-full max-h-full object-contain" />
             </div>
-            <div className="absolute -top-4 -right-4 w-full h-full bg-primary/20 rounded-2xl -z-10 transition-all duration-500 ease-out group-hover:bg-primary/30" />
-            <div className="absolute -bottom-4 -left-4 w-full h-full bg-secondary/20 rounded-2xl -z-20 transition-all duration-500 ease-out group-hover:bg-secondary/30" />
           </motion.div>
         </div>
       </div>
