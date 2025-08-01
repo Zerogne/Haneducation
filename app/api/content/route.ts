@@ -255,25 +255,41 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Section is required" }, { status: 400 })
     }
 
-    // Delete existing content for this section and language combination
-    await Content.deleteMany({ section, language: data.language || "mn" })
-
-    // Create new content with stringified content field
-    const content = new Content({
-      section: data.section,
-      title: data.title || "",
-      subtitle: data.subtitle || "",
-      content: data.content || JSON.stringify(data), // Use provided content or stringify the entire data object
-      description: data.description || "",
-      language: data.language || "mn",
-      isActive: data.isActive !== false,
-      order: data.order || 0,
-      metadata: data.metadata || {}
+    // Find existing content for this section and language combination
+    const existingContent = await Content.findOne({ 
+      section, 
+      language: data.language || "mn" 
     })
-    
-    await content.save()
 
-    return NextResponse.json({ content })
+    if (existingContent) {
+      // Update existing content
+      existingContent.title = data.title || existingContent.title
+      existingContent.subtitle = data.subtitle || existingContent.subtitle
+      existingContent.content = data.content || existingContent.content
+      existingContent.description = data.description || existingContent.description
+      existingContent.isActive = data.isActive !== undefined ? data.isActive : existingContent.isActive
+      existingContent.order = data.order || existingContent.order
+      existingContent.metadata = data.metadata || existingContent.metadata
+      
+      await existingContent.save()
+      return NextResponse.json({ content: existingContent })
+    } else {
+      // Create new content if none exists
+      const content = new Content({
+        section: data.section,
+        title: data.title || "",
+        subtitle: data.subtitle || "",
+        content: data.content || JSON.stringify(data),
+        description: data.description || "",
+        language: data.language || "mn",
+        isActive: data.isActive !== false,
+        order: data.order || 0,
+        metadata: data.metadata || {}
+      })
+      
+      await content.save()
+      return NextResponse.json({ content })
+    }
   } catch (error) {
     console.error("Error updating content:", error)
     return NextResponse.json({ 
