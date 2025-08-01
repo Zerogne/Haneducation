@@ -256,23 +256,64 @@ export async function PUT(req: NextRequest) {
     })
 
     if (existingContent) {
-      // Update existing content - preserve existing data if not provided
-      const updateData = {
-        title: data.title !== undefined ? data.title : existingContent.title,
-        subtitle: data.subtitle !== undefined ? data.subtitle : existingContent.subtitle,
-        content: data.content !== undefined ? data.content : existingContent.content,
-        description: data.description !== undefined ? data.description : existingContent.description,
-        isActive: data.isActive !== undefined ? data.isActive : existingContent.isActive,
-        order: data.order !== undefined ? data.order : existingContent.order,
-        metadata: data.metadata || existingContent.metadata
+      // For hero section, we need to merge the statistics properly
+      if (section === "hero") {
+        let existingHeroData: any = {}
+        try {
+          existingHeroData = JSON.parse(existingContent.content)
+        } catch (error) {
+          console.error("Error parsing existing hero content:", error)
+          existingHeroData = {}
+        }
+
+        // Parse the new content
+        let newHeroData: any = {}
+        try {
+          newHeroData = JSON.parse(data.content)
+        } catch (error) {
+          console.error("Error parsing new hero content:", error)
+          newHeroData = data.content || {}
+        }
+
+        // Merge the data, preserving existing stats if not provided in new data
+        const mergedHeroData = {
+          ...existingHeroData,
+          ...newHeroData,
+          stats: {
+            ...(existingHeroData.stats || {}),
+            ...(newHeroData.stats || {})
+          },
+          statsLabels: {
+            ...(existingHeroData.statsLabels || {}),
+            ...(newHeroData.statsLabels || {})
+          }
+        }
+
+        // Update the existing content with merged data
+        existingContent.content = JSON.stringify(mergedHeroData)
+        await existingContent.save()
+        
+        console.log(`Updated existing hero content with merged statistics:`, mergedHeroData)
+        return NextResponse.json({ content: existingContent })
+      } else {
+        // For other sections, use the original logic
+        const updateData = {
+          title: data.title !== undefined ? data.title : existingContent.title,
+          subtitle: data.subtitle !== undefined ? data.subtitle : existingContent.subtitle,
+          content: data.content !== undefined ? data.content : existingContent.content,
+          description: data.description !== undefined ? data.description : existingContent.description,
+          isActive: data.isActive !== undefined ? data.isActive : existingContent.isActive,
+          order: data.order !== undefined ? data.order : existingContent.order,
+          metadata: data.metadata || existingContent.metadata
+        }
+        
+        // Update the existing content
+        Object.assign(existingContent, updateData)
+        await existingContent.save()
+        
+        console.log(`Updated existing content for section: ${section}`)
+        return NextResponse.json({ content: existingContent })
       }
-      
-      // Update the existing content
-      Object.assign(existingContent, updateData)
-      await existingContent.save()
-      
-      console.log(`Updated existing content for section: ${section}`)
-      return NextResponse.json({ content: existingContent })
     } else {
       // Create new content if none exists
       const content = new Content({

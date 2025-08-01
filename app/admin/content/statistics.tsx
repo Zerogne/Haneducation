@@ -54,10 +54,23 @@ interface StatisticsProps {
 }
 
 export function Statistics({ content, updateStats, updateStatsLabels, saveContent, saving }: StatisticsProps) {
-  // Add null checks and default values
+  // Add null checks and default values with better fallbacks
   const hero = content?.hero || {}
   const stats = hero.stats || { students: "", universities: "", experience: "" }
   const statsLabels = hero.statsLabels || { students: "", universities: "", experience: "" }
+
+  // Ensure all required fields exist
+  const safeStats = {
+    students: stats.students || "",
+    universities: stats.universities || "",
+    experience: stats.experience || ""
+  }
+  
+  const safeStatsLabels = {
+    students: statsLabels.students || "",
+    universities: statsLabels.universities || "",
+    experience: statsLabels.experience || ""
+  }
 
   return (
     <Card>
@@ -72,7 +85,7 @@ export function Statistics({ content, updateStats, updateStatsLabels, saveConten
               <Label htmlFor="hero-students" className="text-sm sm:text-base">Students Count</Label>
               <Input
                 id="hero-students"
-                value={stats.students || ""}
+                value={safeStats.students}
                 onChange={(e) => updateStats("hero", "students", e.target.value)}
                 placeholder="60+"
                 className="text-sm sm:text-base"
@@ -82,7 +95,7 @@ export function Statistics({ content, updateStats, updateStatsLabels, saveConten
               <Label htmlFor="hero-universities" className="text-sm sm:text-base">Universities Count</Label>
               <Input
                 id="hero-universities"
-                value={stats.universities || ""}
+                value={safeStats.universities}
                 onChange={(e) => updateStats("hero", "universities", e.target.value)}
                 placeholder="880+"
                 className="text-sm sm:text-base"
@@ -92,7 +105,7 @@ export function Statistics({ content, updateStats, updateStatsLabels, saveConten
               <Label htmlFor="hero-experience" className="text-sm sm:text-base">Experience Years</Label>
               <Input
                 id="hero-experience"
-                value={stats.experience || ""}
+                value={safeStats.experience}
                 onChange={(e) => updateStats("hero", "experience", e.target.value)}
                 placeholder="4+"
                 className="text-sm sm:text-base"
@@ -108,7 +121,7 @@ export function Statistics({ content, updateStats, updateStatsLabels, saveConten
               <Label htmlFor="hero-students-label" className="text-sm sm:text-base">Students Label</Label>
               <Input
                 id="hero-students-label"
-                value={statsLabels.students || ""}
+                value={safeStatsLabels.students}
                 onChange={(e) => updateStatsLabels("hero", "students", e.target.value)}
                 placeholder="Амжилттай оюутан"
                 className="text-sm sm:text-base"
@@ -118,7 +131,7 @@ export function Statistics({ content, updateStats, updateStatsLabels, saveConten
               <Label htmlFor="hero-universities-label" className="text-sm sm:text-base">Universities Label</Label>
               <Input
                 id="hero-universities-label"
-                value={statsLabels.universities || ""}
+                value={safeStatsLabels.universities}
                 onChange={(e) => updateStatsLabels("hero", "universities", e.target.value)}
                 placeholder="Хамтрагч их сургууль"
                 className="text-sm sm:text-base"
@@ -128,7 +141,7 @@ export function Statistics({ content, updateStats, updateStatsLabels, saveConten
               <Label htmlFor="hero-experience-label" className="text-sm sm:text-base">Experience Label</Label>
               <Input
                 id="hero-experience-label"
-                value={statsLabels.experience || ""}
+                value={safeStatsLabels.experience}
                 onChange={(e) => updateStatsLabels("hero", "experience", e.target.value)}
                 placeholder="Жилийн туршлага"
                 className="text-sm sm:text-base"

@@ -63,8 +63,8 @@ export function CallToAction() {
 
   return (
     <section id="contact" className="py-20 w-full">
-      <div className="max-w-7xl mx-auto px-8 lg:px-16">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-16">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -72,36 +72,36 @@ export function CallToAction() {
             viewport={{ once: true }}
             className="space-y-8"
           >
-            <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-bold">{loading ? "Холбоо барих" : content.title || "Холбоо барих"}</h2>
-              <p className="text-xl text-muted-foreground">
+            <div className="space-y-3 sm:space-y-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center lg:text-left">{loading ? "Холбоо барих" : content.title || "Холбоо барих"}</h2>
+              <p className="text-lg sm:text-xl text-muted-foreground text-center lg:text-left">
                 {loading ? "Бидэнтэй холбогдоод үнэгүй зөвлөгөө аваарай" : content.description || "Бидэнтэй холбогдоод үнэгүй зөвлөгөө аваарай"}
               </p>
             </div>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 group cursor-pointer p-3 rounded-lg hover:bg-primary/5 transition-all duration-300 ease-out">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 ease-out">
-                  <Phone className="h-5 w-5 text-primary" />
+            <div className="space-y-3 sm:space-y-4 flex flex-col items-center lg:items-start">
+              <div className="flex items-center space-x-3 group cursor-pointer p-2 sm:p-3 rounded-lg hover:bg-primary/5 transition-all duration-300 ease-out w-full max-w-sm">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 ease-out">
+                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium group-hover:text-primary transition-colors duration-300 ease-out">Утас</p>
-                  <p className="text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">{loading ? "+976 7777 7777" : content.phone || "+976 7777 7777"}</p>
+                  <p className="font-medium group-hover:text-primary transition-colors duration-300 ease-out text-sm sm:text-base">Утас</p>
+                  <p className="text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out text-sm sm:text-base">{loading ? "+976 7777 7777" : content.phone || "+976 7777 7777"}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 group cursor-pointer p-3 rounded-lg hover:bg-primary/5 transition-all duration-300 ease-out">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 ease-out">
-                  <Mail className="h-5 w-5 text-primary" />
+              <div className="flex items-center space-x-3 group cursor-pointer p-2 sm:p-3 rounded-lg hover:bg-primary/5 transition-all duration-300 ease-out w-full max-w-sm">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 ease-out">
+                  <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium group-hover:text-primary transition-colors duration-300 ease-out">И-мэйл</p>
-                  <p className="text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out">{loading ? "info@haneducation.mn" : content.email || "info@haneducation.mn"}</p>
+                  <p className="font-medium group-hover:text-primary transition-colors duration-300 ease-out text-sm sm:text-base">И-мэйл</p>
+                  <p className="text-muted-foreground group-hover:text-primary/70 transition-colors duration-300 ease-out text-sm sm:text-base">{loading ? "info@haneducation.mn" : content.email || "info@haneducation.mn"}</p>
                 </div>
               </div>
             </div>
-            <div className="w-full">
+            <div className="w-full flex justify-center lg:justify-start">
               <Button 
                 size="lg" 
-                className="group relative bg-primary hover:bg-primary/90 transition-all duration-300 ease-out shadow-lg hover:shadow-xl w-full" 
+                className="group relative bg-primary hover:bg-primary/90 transition-all duration-300 ease-out shadow-lg hover:shadow-xl w-full max-w-sm" 
                 asChild
               >
                 <a href="/registration" className="relative z-10">
@@ -119,7 +119,7 @@ export function CallToAction() {
             className="group"
           >
             <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-0 hover:shadow-lg transition-all duration-300 ease-out hover:-translate-y-1 relative overflow-hidden">
-              <CardContent className="p-8 relative z-10">
+              <CardContent className="p-4 sm:p-6 lg:p-8 relative z-10">
                 <div className="space-y-6">
                   <div className="text-center">
                     <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors duration-300 ease-out">Үнэгүй зөвлөгөө авах</h3>

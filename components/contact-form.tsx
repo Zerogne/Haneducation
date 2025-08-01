@@ -70,7 +70,7 @@ export function ContactForm() {
   }
 
   return (
-    <div className="grid lg:grid-cols-2 gap-8">
+    <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
       {/* Contact Information */}
       <div className="space-y-6">
         <div>

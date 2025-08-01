@@ -187,7 +187,16 @@ export default function ContentPage() {
           const parsedContent = data.content.reduce((acc: any, item: any) => {
             try {
               const parsed = JSON.parse(item.content)
-              acc[item.section] = parsed
+              // For hero section, ensure stats and statsLabels are properly structured
+              if (item.section === 'hero') {
+                acc[item.section] = {
+                  ...parsed,
+                  stats: parsed.stats || { students: "", universities: "", experience: "" },
+                  statsLabels: parsed.statsLabels || { students: "", universities: "", experience: "" }
+                }
+              } else {
+                acc[item.section] = parsed
+              }
             } catch (error) {
               console.error(`Error parsing content for section ${item.section}:`, error)
             }
@@ -214,6 +223,23 @@ export default function ContentPage() {
       setSaving(true)
       console.log(`Saving ${section} content:`, sectionData)
       
+      // For hero section, ensure we're saving the complete structure
+      let contentToSave = sectionData
+      if (section === "hero") {
+        contentToSave = {
+          ...content.hero,
+          ...sectionData,
+          stats: {
+            ...content.hero.stats,
+            ...sectionData.stats
+          },
+          statsLabels: {
+            ...content.hero.statsLabels,
+            ...sectionData.statsLabels
+          }
+        }
+      }
+      
       const response = await fetch('/api/content', {
         method: 'PUT',
         headers: {
@@ -221,7 +247,7 @@ export default function ContentPage() {
         },
         body: JSON.stringify({
           section,
-          content: JSON.stringify(sectionData),
+          content: JSON.stringify(contentToSave),
           language: "mn"
         }),
       })
