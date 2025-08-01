@@ -7,6 +7,24 @@ import { useTheme } from "next-themes"
 import Link from "next/link"
 import { Logo } from "@/components/ui/logo"
 
+// Smooth scroll function
+const smoothScrollTo = (targetId: string) => {
+  if (targetId === '#top') {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  } else {
+    const target = document.querySelector(targetId)
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+  }
+}
+
 export default function Header() {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -18,10 +36,11 @@ export default function Header() {
 
   // Simple navigation items - will be managed through database content
   const navItems = [
-    { href: "/", label: "Нүүр" },
+    { href: "#top", label: "Нүүр" },
     { href: "#about", label: "Бидний тухай" },
     { href: "#why-china", label: "Хятад дахь боловсрол" },
     { href: "#services", label: "Үйлчилгээ" },
+    { href: "#partners", label: "Хамтрагчид" },
     { href: "#contact", label: "Холбоо барих" },
   ]
 
@@ -38,13 +57,19 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
-              <Link 
+              <button
                 key={item.href}
-                href={item.href} 
-                className="text-sm font-medium transition-colors hover:text-primary"
+                onClick={() => {
+                  if (item.href.startsWith('#')) {
+                    smoothScrollTo(item.href)
+                  } else {
+                    window.location.href = item.href
+                  }
+                }}
+                className="text-sm font-medium transition-colors hover:text-primary bg-transparent border-none cursor-pointer"
               >
                 {item.label}
-              </Link>
+              </button>
             ))}
           </nav>
 
@@ -97,14 +122,20 @@ export default function Header() {
           <div className="py-4 border-t">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
-                <Link
+                <button
                   key={item.href}
-                  href={item.href}
-                  className="text-sm font-medium transition-colors hover:text-primary"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    if (item.href.startsWith('#')) {
+                      smoothScrollTo(item.href)
+                    } else {
+                      window.location.href = item.href
+                    }
+                    setIsMenuOpen(false)
+                  }}
+                  className="text-sm font-medium transition-colors hover:text-primary bg-transparent border-none cursor-pointer text-left"
                 >
                   {item.label}
-                </Link>
+                </button>
               ))}
               <div className="flex items-center space-x-4 pt-4">
                 <Button

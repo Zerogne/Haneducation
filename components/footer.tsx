@@ -5,6 +5,17 @@ import { Facebook, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react"
 import { Logo } from "@/components/ui/logo"
 import { useState, useEffect } from "react"
 
+// Smooth scroll function
+const smoothScrollTo = (targetId: string) => {
+  const target = document.querySelector(targetId)
+  if (target) {
+    target.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }
+}
+
 
 interface FooterContent {
   description: string
@@ -96,10 +107,10 @@ export function Footer() {
               {loading ? "Хятадад тэтгэлэгтэй суралцах боломжийг танд олгоно" : content.description || "Хятадад тэтгэлэгтэй суралцах боломжийг танд олгоно"}
             </p>
             <div className="flex space-x-4">
-              <Link href="#" className="text-muted-foreground hover:text-primary">
+              <Link href="https://www.facebook.com/profile.php?id=61574712638499" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                 <Facebook className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary">
+              <Link href="https://www.instagram.com/haneducation_/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                 <Instagram className="h-5 w-5" />
               </Link>
             </div>
@@ -109,24 +120,24 @@ export function Footer() {
             <h3 className="font-semibold">Үйлчилгээ</h3>
             <ul className="space-y-2 text-muted-foreground">
               <li>
-                <Link href="#" className="hover:text-primary">
+                <button onClick={() => smoothScrollTo('#services')} className="hover:text-primary bg-transparent border-none cursor-pointer text-left w-full text-muted-foreground">
                   Их сургуулийн элсэлт
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="#" className="hover:text-primary">
+                <button onClick={() => smoothScrollTo('#services')} className="hover:text-primary bg-transparent border-none cursor-pointer text-left w-full text-muted-foreground">
                   Хятад хэлний сургалт
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="#" className="hover:text-primary">
+                <button onClick={() => smoothScrollTo('#services')} className="hover:text-primary bg-transparent border-none cursor-pointer text-left w-full text-muted-foreground">
                   Виз, баримт бичиг
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="#" className="hover:text-primary">
+                <button onClick={() => smoothScrollTo('#services')} className="hover:text-primary bg-transparent border-none cursor-pointer text-left w-full text-muted-foreground">
                   Тэтгэлэг
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -135,25 +146,25 @@ export function Footer() {
             <h3 className="font-semibold">Бидний тухай</h3>
             <ul className="space-y-2 text-muted-foreground">
               <li>
-                <Link href="#" className="hover:text-primary">
+                <button onClick={() => smoothScrollTo('#about')} className="hover:text-primary bg-transparent border-none cursor-pointer text-left w-full text-muted-foreground">
                   Бидний тухай
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="#" className="hover:text-primary">
+                <button onClick={() => smoothScrollTo('#team')} className="hover:text-primary bg-transparent border-none cursor-pointer text-left w-full text-muted-foreground">
                   Багийн гишүүд
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="#" className="hover:text-primary">
+                <button onClick={() => smoothScrollTo('#partners')} className="hover:text-primary bg-transparent border-none cursor-pointer text-left w-full text-muted-foreground">
                   Хамтрагч их сургууль
-                </Link>
+                </button>
               </li>
               
               <li>
-                <Link href="#" className="hover:text-primary">
+                <button onClick={() => smoothScrollTo('#contact')} className="hover:text-primary bg-transparent border-none cursor-pointer text-left w-full text-muted-foreground">
                   Холбоо барих
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

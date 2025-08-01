@@ -12,8 +12,23 @@ import { Toaster } from "sonner"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "HAN Education - Хятад дахь суралцах таны гүүр",
-  description: "Хувийн боловсролын зөвлөх үйлчилгээ | 2022 оноос хойш үйл ажиллагаа явуулж байгаа туршлагатай"
+  title: "HAN Education",
+  description: "Хувийн боловсролын зөвлөх үйлчилгээ | 2022 оноос хойш үйл ажиллагаа явуулж байгаа туршлагатай",
+  icons: {
+    icon: [
+      {
+        url: '/image-removebg-preview.png',
+        sizes: '32x32',
+        type: 'image/png',
+      },
+      {
+        url: '/image-removebg-preview.png',
+        sizes: '16x16',
+        type: 'image/png',
+      }
+    ],
+    apple: '/image-removebg-preview.png',
+  }
 }
 
 export default function RootLayout({
