@@ -1,42 +1,48 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongoose"
 import Content from "@/models/content"
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await connectToDatabase()
     
-    // First, clear any existing content to avoid duplicate key errors
-    await Content.deleteMany({})
+    // Get all content from database
+    const allContent = await Content.find({}).sort({ createdAt: -1 })
     
-    // Test creating a simple content item with valid section
-    const testContent = new Content({
-      section: "hero", // Using valid enum value
-      title: "Test Content",
-      content: JSON.stringify({ test: "data" }),
-      description: "Test description",
-      language: "en",
-      isActive: true,
-      order: 1
-    })
+    // Get content by section
+    const contactContent = await Content.find({ section: "contact" })
+    const heroContent = await Content.find({ section: "hero" })
     
-    await testContent.save()
-    
-    // Clean up - delete the test content
-    await Content.deleteOne({ section: "hero", title: "Test Content" })
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: "Content API is working properly",
-      database: "Connected successfully",
-      validSections: ["hero", "about", "services", "testimonials", "team", "partners", "contact", "footer"]
+    return NextResponse.json({
+      message: "Content test results",
+      totalContent: allContent.length,
+      contactContent: contactContent.length,
+      heroContent: heroContent.length,
+      allContent: allContent.map(item => ({
+        section: item.section,
+        language: item.language,
+        title: item.title,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt
+      })),
+      contactDetails: contactContent.map(item => ({
+        section: item.section,
+        language: item.language,
+        content: item.content,
+        createdAt: item.createdAt
+      })),
+      heroDetails: heroContent.map(item => ({
+        section: item.section,
+        language: item.language,
+        content: item.content,
+        createdAt: item.createdAt
+      }))
     })
   } catch (error) {
-    console.error("Test content error:", error)
+    console.error("Error testing content:", error)
     return NextResponse.json({ 
-      success: false, 
-      error: error instanceof Error ? error.message : "Unknown error",
-      database: "Connection failed"
+      error: "Failed to test content",
+      details: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 })
   }
 } 

@@ -84,7 +84,7 @@ export default function ContentPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [selectedLanguage, setSelectedLanguage] = useState("mn")
+
   const [hasInitialized, setHasInitialized] = useState(false)
   
   // Team management state
@@ -178,7 +178,7 @@ export default function ContentPage() {
         }
       })
 
-      const response = await fetch(`/api/content?language=${selectedLanguage}`)
+      const response = await fetch(`/api/content`)
       if (response.ok) {
         const data = await response.json()
         console.log('Fetched content:', data)
@@ -222,7 +222,7 @@ export default function ContentPage() {
         body: JSON.stringify({
           section,
           content: JSON.stringify(sectionData),
-          language: selectedLanguage
+          language: "mn"
         }),
       })
 

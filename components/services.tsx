@@ -126,7 +126,7 @@ export function Services() {
 
   const fetchSectionContent = async () => {
     try {
-      const response = await fetch(`/api/content?section=services&language=mn`)
+      const response = await fetch(`/api/content?section=services`)
       if (response.ok) {
         const data = await response.json()
         if (data.content && data.content.length > 0) {

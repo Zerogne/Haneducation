@@ -176,15 +176,7 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-800 font-medium mb-1">Demo Credentials:</p>
-            <p className="text-sm text-blue-700">
-              Username: <span className="font-mono">admin</span>
-            </p>
-            <p className="text-sm text-blue-700">
-              Password: <span className="font-mono">HanEducation123@</span>
-            </p>
-          </div>
+          
         </CardContent>
       </Card>
     </div>

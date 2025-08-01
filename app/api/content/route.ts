@@ -74,7 +74,6 @@ export async function GET(req: NextRequest) {
     await connectToDatabase()
     const { searchParams } = new URL(req.url)
     const section = searchParams.get("section")
-    const language = searchParams.get("language") || "mn"
     
     let query: any = { isActive: true }
     
@@ -82,15 +81,11 @@ export async function GET(req: NextRequest) {
       query.section = section
     }
     
-    if (language) {
-      query.language = language
-    }
-    
     const content = await Content.find(query).sort({ order: 1 })
     
     if (content.length === 0) {
       // Return default content if no content found
-      if (section === "about" && language === "mn") {
+      if (section === "about") {
         return NextResponse.json({ 
           content: [{
             section: "about",
@@ -194,7 +189,7 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      if (section && language === "mn" && defaultContentMap[section]) {
+      if (section && defaultContentMap[section]) {
         return NextResponse.json({ 
           content: [defaultContentMap[section]],
           message: `Returning default content for ${section} section`
@@ -255,23 +250,28 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Section is required" }, { status: 400 })
     }
 
-    // Find existing content for this section and language combination
+    // Find existing content for this section
     const existingContent = await Content.findOne({ 
-      section, 
-      language: data.language || "mn" 
+      section
     })
 
     if (existingContent) {
-      // Update existing content
-      existingContent.title = data.title || existingContent.title
-      existingContent.subtitle = data.subtitle || existingContent.subtitle
-      existingContent.content = data.content || existingContent.content
-      existingContent.description = data.description || existingContent.description
-      existingContent.isActive = data.isActive !== undefined ? data.isActive : existingContent.isActive
-      existingContent.order = data.order || existingContent.order
-      existingContent.metadata = data.metadata || existingContent.metadata
+      // Update existing content - preserve existing data if not provided
+      const updateData = {
+        title: data.title !== undefined ? data.title : existingContent.title,
+        subtitle: data.subtitle !== undefined ? data.subtitle : existingContent.subtitle,
+        content: data.content !== undefined ? data.content : existingContent.content,
+        description: data.description !== undefined ? data.description : existingContent.description,
+        isActive: data.isActive !== undefined ? data.isActive : existingContent.isActive,
+        order: data.order !== undefined ? data.order : existingContent.order,
+        metadata: data.metadata || existingContent.metadata
+      }
       
+      // Update the existing content
+      Object.assign(existingContent, updateData)
       await existingContent.save()
+      
+      console.log(`Updated existing content for section: ${section}`)
       return NextResponse.json({ content: existingContent })
     } else {
       // Create new content if none exists
@@ -281,13 +281,14 @@ export async function PUT(req: NextRequest) {
         subtitle: data.subtitle || "",
         content: data.content || JSON.stringify(data),
         description: data.description || "",
-        language: data.language || "mn",
+        language: "mn",
         isActive: data.isActive !== false,
         order: data.order || 0,
         metadata: data.metadata || {}
       })
       
       await content.save()
+      console.log(`Created new content for section: ${section}`)
       return NextResponse.json({ content })
     }
   } catch (error) {

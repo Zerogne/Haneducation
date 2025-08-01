@@ -55,7 +55,7 @@ export function Footer() {
 
   const fetchFooterContent = async () => {
     try {
-      const response = await fetch(`/api/content?section=footer&language=mn`)
+      const response = await fetch(`/api/content?section=footer`)
       if (response.ok) {
         const data = await response.json()
         if (data.content && data.content.length > 0) {
@@ -75,7 +75,7 @@ export function Footer() {
 
   const fetchContactContent = async () => {
     try {
-      const response = await fetch(`/api/content?section=contact&language=mn`)
+      const response = await fetch(`/api/content?section=contact`)
       if (response.ok) {
         const data = await response.json()
         if (data.content && data.content.length > 0) {

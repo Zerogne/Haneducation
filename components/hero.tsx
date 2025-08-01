@@ -53,7 +53,7 @@ export function Hero() {
   const fetchHeroStats = async () => {
     try {
       console.log("Fetching hero stats...")
-      const response = await fetch('/api/content?section=hero&language=mn')
+      const response = await fetch('/api/content?section=hero')
       if (response.ok) {
         const data = await response.json()
         console.log("Hero stats response:", data)

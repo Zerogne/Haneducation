@@ -36,7 +36,7 @@ export function CallToAction() {
   const fetchContactContent = async () => {
     try {
       console.log("Fetching contact content...")
-      const response = await fetch('/api/content?section=contact&language=mn')
+      const response = await fetch('/api/content?section=contact')
       if (response.ok) {
         const data = await response.json()
         console.log("Contact content response:", data)
