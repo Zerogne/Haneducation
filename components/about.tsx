@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { GraduationCap, Users, Award, Globe, CheckCircle, Building } from "lucide-react"
+import { GraduationCap, Users, Award, Globe, CheckCircle, Building, Shield } from "lucide-react"
 import { motion } from "framer-motion"
 
 
@@ -28,6 +28,7 @@ const iconMap: { [key: string]: any } = {
   Globe,
   Building,
   CheckCircle,
+  Shield,
 }
 
 export function About() {
@@ -51,7 +52,7 @@ export function About() {
       {
         title: "Цогц үйлчилгээ",
         description: "Элсэлтээс эхлээд виз, орчуулга хүртэл бүх үйлчилгээг нэг дороос",
-        icon: "ShieldCheck"
+        icon: "Shield"
       }
     ]
   })
@@ -104,7 +105,7 @@ export function About() {
           >
             <div className="relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 ease-out group-hover:shadow-xl group-hover:-translate-y-1">
               <img
-                src="/placeholder.svg?height=400&width=500&text=HAN+Education+Office"
+                src="https://res.cloudinary.com/dewhswho9/image/upload/v1754370909/527598476_1098990758838320_7936771941177688783_n.jpg_mpzjcn.jpg"
                 alt="HAN Education оффис"
                 className="rounded-2xl transition-transform duration-300 ease-out group-hover:scale-105"
               />
