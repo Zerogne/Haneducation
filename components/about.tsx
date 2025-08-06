@@ -101,14 +101,14 @@ export function About() {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="group cursor-pointer w-fit mx-auto"
+            className="group cursor-pointer w-fit mx-auto flex justify-center "
           >
-            <div className="relative overflow-hidden rounded-2xl  transition-all duration-300 ease-out  group-hover:-translate-y-1 " style={{ aspectRatio: '3/4' }}>
-              <img
-                src="https://res.cloudinary.com/dewhswho9/image/upload/v1754370909/527598476_1098990758838320_7936771941177688783_n.jpg_mpzjcn.jpg"
-                alt="HAN Education оффис"
-                className="rounded-2xl w-max h-full"
-              />``
+                         <div className="relative overflow-hidden rounded-2xl transition-all duration-300 ease-out  group-hover:-translate-y-1 flex items-center justify-center" style={{ aspectRatio: '3/4' }}>
+                <img
+                  src="https://res.cloudinary.com/dewhswho9/image/upload/v1754370909/527598476_1098990758838320_7936771941177688783_n.jpg_mpzjcn.jpg"
+                  alt="HAN Education оффис"
+                  className="rounded-2xl w-max h-full"
+                />``
             </div>
           </motion.div>
 
