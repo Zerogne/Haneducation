@@ -117,7 +117,7 @@ export function About() {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="space-y-6"
+            className="space-y-6 text-center md:text-left"
           >
             <h3 className="text-2xl font-bold">
               {loading ? "Яагаад HAN Education-г сонгох ёстой вэ?" : content.whyTitle || "Яагаад HAN Education-г сонгох ёстой вэ?"}
