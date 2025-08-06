@@ -95,20 +95,20 @@ export function About() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+        <div className="grid md:grid-cols-2 gap-12 items-center mb-16 ">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="group cursor-pointer"
+            className="group cursor-pointer w-fit mx-auto"
           >
-            <div className="relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 ease-out group-hover:shadow-xl group-hover:-translate-y-1">
+            <div className="relative overflow-hidden rounded-2xl  transition-all duration-300 ease-out  group-hover:-translate-y-1 " style={{ aspectRatio: '3/4' }}>
               <img
                 src="https://res.cloudinary.com/dewhswho9/image/upload/v1754370909/527598476_1098990758838320_7936771941177688783_n.jpg_mpzjcn.jpg"
                 alt="HAN Education оффис"
-                className="rounded-2xl transition-transform duration-300 ease-out group-hover:scale-105"
-              />
+                className="rounded-2xl w-max h-full"
+              />``
             </div>
           </motion.div>
 
